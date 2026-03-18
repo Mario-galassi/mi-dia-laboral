@@ -797,7 +797,7 @@ function renderNotas(){
     </div>
     <div class="note-time">${new Date(n.ts).toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'})} · ${fmt(n.ts)}</div>
   </div>`).join('')}
-  ${!S.notes.length?`<div class="empty" style="margin-top:1rem">Sin notas guardadas.</div>`:'`}`;
+  ${!S.notes.length?`<div class="empty" style="margin-top:1rem">Sin notas guardadas.</div>`:''}`;
 }
 
 function renderAreas(){
@@ -938,7 +938,7 @@ async function transcribeAudio(target){
   setVoiceStatus(target,'','Transcribiendo con Whisper...');
   try{
     const form=new FormData();
-    form.append('file',blob,`audio.${ext}`);
+    form.append('file',blob,'audio.'+ext);
     form.append('model','whisper-1');
     form.append('language','es');
     const r=await fetch('https://api.openai.com/v1/audio/transcriptions',{
