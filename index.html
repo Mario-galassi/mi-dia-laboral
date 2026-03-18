@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Día Laboral</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --bg:#f5f4f0;--surface:#ffffff;--surface2:#f0efe9;
+    --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+    --text:#1a1a18;--text2:#6b6b65;--text3:#a0a09a;
+    --radius:8px;--radius-lg:12px;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{--bg:#1a1a18;--surface:#242420;--surface2:#2e2e2a;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0efe9;--text2:#a0a09a;--text3:#6b6b65;}
+    input[type=date]{color-scheme:dark}
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+  .app{max-width:740px;margin:0 auto;padding:1.5rem 1rem 4rem}
+  .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
+  .header h1{font-size:22px;font-weight:600;letter-spacing:-.02em}
+  .header .date{font-size:13px;color:var(--text2);margin-top:3px}
+  .sync-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:1.25rem;background:var(--surface);flex-wrap:wrap}
+  .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .sync-dot.ok{background:#1d9e75}
+  .sync-dot.error{background:#e24b4a}
+  .sync-dot.loading{background:#ef9f27;animation:pulse 1s infinite}
+  .sync-dot.offline{background:var(--text3)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .sync-txt{font-size:12px;color:var(--text2);flex:1}
+  .sync-btn{padding:5px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:12px;cursor:pointer;background:var(--surface2);color:var(--text);white-space:nowrap}
+  .sync-btn:hover{background:var(--border)}
+  .setup-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem}
+  .setup-card h2{font-size:16px;font-weight:500;margin-bottom:.75rem}
+  .setup-card p{font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.6}
+  .setup-card ol{font-size:13px;color:var(--text2);padding-left:1.25rem;line-height:2}
+  .setup-card a{color:var(--text);text-decoration:underline}
+  .setup-card input{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;background:var(--surface2);color:var(--text);font-family:inherit;outline:none;margin-top:.5rem}
+  .setup-row{display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.5rem}
+  .stat{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:.75rem 1rem;text-align:center}
+  .stat-n{font-size:24px;font-weight:600;letter-spacing:-.02em}
+  .stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+  .tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+  .tab{padding:7px 16px;border:0.5px solid var(--border2);border-radius:100px;font-size:13px;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap}
+  .tab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:.5rem}
+  .add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+  .add-grid .full{grid-column:1/-1}
+  input[type=text],input[type=date],select,textarea{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;background:var(--surface2);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--text)}
+  textarea{resize:vertical;min-height:80px;line-height:1.6}
+  .btn-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .btn{padding:8px 16px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:13px;cursor:pointer;background:var(--surface);color:var(--text);font-family:inherit;transition:all .15s;white-space:nowrap}
+  .btn:hover{background:var(--surface2)}
+  .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .btn.primary:hover{opacity:.85}
+  .filters{display:flex;gap:5px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+  .filters .lbl{font-size:12px;color:var(--text3);margin-right:2px}
+  .ftab{padding:4px 11px;border:0.5px solid var(--border);border-radius:100px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap}
+  .ftab.active{background:var(--surface2);color:var(--text);border-color:var(--border2);font-weight:500}
+  .sec-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface);transition:opacity .2s}
+  .task-item.done{opacity:.4}
+  .task-item.done .task-text{text-decoration:line-through}
+  .check{width:20px;height:20px;border:0.5px solid var(--border2);border-radius:5px;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--surface2);color:var(--text);transition:all .15s}
+  .check.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .task-body{flex:1;min-width:0}
+  .task-text{font-size:14px;color:var(--text);line-height:1.4;word-break:break-word}
+  .task-meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:5px}
+  .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;border:0.5px solid transparent;white-space:nowrap}
+  .pill.urgente{background:#fff0ed;color:#b93000;border-color:#f5c4a8}
+  .pill.normal{background:#edf4ff;color:#1a5ea8;border-color:#b5d4f4}
+  .pill.completada{background:#edfaf3;color:#0f6e56;border-color:#9fe1cb}
+  .pill.pendiente{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+  .pill.vencida{background:#fff0f0;color:#a32d2d;border-color:#f7c1c1}
+  .pill.hoy{background:#fef8ec;color:#854f0b;border-color:#fac775}
+  .pill.area,.pill.reporte{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+  .del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:0 2px;flex-shrink:0;margin-top:1px}
+  .del-btn:hover{color:var(--text)}
+  .empty{text-align:center;padding:2.5rem 1rem;color:var(--text3);font-size:14px;border:0.5px dashed var(--border2);border-radius:var(--radius-lg)}
+  .area-manage{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .area-chip{display:flex;align-items:center;gap:5px;padding:5px 12px;border:0.5px solid var(--border2);border-radius:100px;font-size:13px;background:var(--surface2);color:var(--text)}
+  .area-chip button{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;line-height:1;padding:0}
+  .area-chip button:hover{color:var(--text)}
+  .note-card{padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface)}
+  .note-text{font-size:14px;color:var(--text);line-height:1.5;white-space:pre-wrap;word-break:break-word}
+  .note-time{font-size:11px;color:var(--text3);margin-top:5px}
+  @media(max-width:480px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .add-grid{grid-template-columns:1fr}
+    .add-grid .full{grid-column:1}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>Mi día laboral</h1>
+      <div class="date" id="fecha"></div>
+    </div>
+  </div>
+
+  <!-- SETUP PANEL (visible solo si no hay API key) -->
+  <div id="setup-panel" style="display:none">
+    <div class="setup-card">
+      <h2>Configurar sincronización</h2>
+      <p>Para sincronizar entre tu computadora y celular, necesitás una clave gratuita de <strong>JSONBin.io</strong>. Solo se hace una vez.</p>
+      <ol>
+        <li>Entrá a <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> y creá una cuenta gratuita</li>
+        <li>Una vez dentro, andá a <strong>API Keys</strong> en el menú</li>
+        <li>Copiá tu <strong>Master Key</strong> (empieza con <code>$2b$</code>)</li>
+        <li>Pegala acá abajo y hacé clic en "Guardar y conectar"</li>
+      </ol>
+      <input type="text" id="api-key-input" placeholder="Pegá tu Master Key acá..." style="margin-top:12px">
+      <div class="setup-row">
+        <button class="btn primary" onclick="saveApiKey()">Guardar y conectar</button>
+        <button class="btn" onclick="skipSetup()">Usar sin sincronización</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYNC BAR (visible cuando está configurado) -->
+  <div id="sync-bar" class="sync-bar" style="display:none">
+    <div class="sync-dot offline" id="sync-dot"></div>
+    <span class="sync-txt" id="sync-txt">Sin sincronizar</span>
+    <button class="sync-btn" onclick="syncNow()">↻ Sincronizar ahora</button>
+    <button class="sync-btn" onclick="resetConfig()">Configuración</button>
+  </div>
+
+  <div id="main-content" style="display:none">
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Tareas</div></div>
+      <div class="stat"><div class="stat-n" id="st-urg">0</div><div class="stat-l">Urgentes</div></div>
+      <div class="stat"><div class="stat-n" id="st-done">0</div><div class="stat-l">Completadas</div></div>
+      <div class="stat"><div class="stat-n" id="st-venc">0</div><div class="stat-l">Vencidas</div></div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+const LKEY='dia_laboral_v3';
+const CFGKEY='dia_laboral_cfg';
+
+let CFG=JSON.parse(localStorage.getItem(CFGKEY)||'{}');
+let S=JSON.parse(localStorage.getItem(LKEY)||'null')||{
+  areas:['Operaciones','Comercial','RRHH','Finanzas'],
+  reportes:['Ana','Carlos','Martín','Sofía'],
+  tasks:[],notes:[],
+  tab:'tareas',fArea:'Todas',fPrio:'Todas',fEstado:'Todas'
+};
+
+function saveLocal(){localStorage.setItem(LKEY,JSON.stringify(S))}
+function uid(){return Math.random().toString(36).slice(2,9)}
+function fmt(ts){return new Date(ts).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}
+function fmtDate(d){if(!d)return '';const[y,m,dd]=d.split('-');return `${dd}/${m}/${y}`}
+function today(){return new Date().toISOString().slice(0,10)}
+function vencLabel(t){if(t.done||!t.fecha)return null;const td=today();if(t.fecha<td)return 'vencida';if(t.fecha===td)return 'hoy';return null;}
+
+document.getElementById('fecha').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ---- SYNC ----
+function setSyncStatus(state, msg){
+  const dot=document.getElementById('sync-dot');
+  const txt=document.getElementById('sync-txt');
+  dot.className='sync-dot '+state;
+  txt.textContent=msg;
+}
+
+async function pushData(){
+  if(!CFG.apiKey||!CFG.binId) return false;
+  try{
+    setSyncStatus('loading','Guardando...');
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Versioning':'false'},
+      body:JSON.stringify(S)
+    });
+    if(!res.ok) throw new Error('error');
+    setSyncStatus('ok','Sincronizado · '+fmt(Date.now()));
+    return true;
+  }catch(e){setSyncStatus('error','Error al guardar');return false;}
+}
+
+async function pullData(){
+  if(!CFG.apiKey||!CFG.binId) return false;
+  try{
+    setSyncStatus('loading','Cargando...');
+    const res=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}/latest`,{
+      headers:{'X-Master-Key':CFG.apiKey}
+    });
+    if(!res.ok) throw new Error('error');
+    const data=await res.json();
+    if(data.record){
+      S={...S,...data.record};
+      saveLocal();
+    }
+    setSyncStatus('ok','Sincronizado · '+fmt(Date.now()));
+    return true;
+  }catch(e){setSyncStatus('error','Sin conexión — usando datos locales');return false;}
+}
+
+async function createBin(){
+  try{
+    const res=await fetch('https://api.jsonbin.io/v3/b',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Name':'MiDiaLaboral','X-Collection-Id':''},
+      body:JSON.stringify(S)
+    });
+    if(!res.ok) throw new Error('error al crear bin');
+    const data=await res.json();
+    return data.metadata.id;
+  }catch(e){return null;}
+}
+
+async function saveApiKey(){
+  const key=document.getElementById('api-key-input').value.trim();
+  if(!key){alert('Por favor pegá tu Master Key');return;}
+  CFG.apiKey=key;
+  setSyncStatus('loading','Conectando...');
+  const binId=await createBin();
+  if(!binId){alert('No se pudo conectar. Verificá que la clave sea correcta.');return;}
+  CFG.binId=binId;
+  localStorage.setItem(CFGKEY,JSON.stringify(CFG));
+  initApp();
+}
+
+function skipSetup(){
+  CFG.skipped=true;
+  localStorage.setItem(CFGKEY,JSON.stringify(CFG));
+  initApp();
+}
+
+function resetConfig(){
+  if(confirm('¿Querés reconfigurar la sincronización?')){
+    CFG={};localStorage.removeItem(CFGKEY);location.reload();
+  }
+}
+
+async function syncNow(){
+  await pullData();
+  render();
+  await pushData();
+}
+
+async function save(){
+  saveLocal();
+  if(CFG.apiKey&&CFG.binId) await pushData();
+}
+
+// ---- INIT ----
+function initApp(){
+  document.getElementById('setup-panel').style.display='none';
+  document.getElementById('main-content').style.display='block';
+  if(CFG.apiKey&&CFG.binId){
+    document.getElementById('sync-bar').style.display='flex';
+    pullData().then(()=>render());
+  } else {
+    render();
+  }
+}
+
+function checkInit(){
+  if(CFG.apiKey&&CFG.binId){initApp();}
+  else if(CFG.skipped){initApp();}
+  else{document.getElementById('setup-panel').style.display='block';}
+}
+
+// ---- STATS ----
+function updateStats(){
+  const td=today();
+  document.getElementById('st-total').textContent=S.tasks.length;
+  document.getElementById('st-urg').textContent=S.tasks.filter(t=>t.prio==='urgente'&&!t.done).length;
+  document.getElementById('st-done').textContent=S.tasks.filter(t=>t.done).length;
+  document.getElementById('st-venc').textContent=S.tasks.filter(t=>!t.done&&t.fecha&&t.fecha<td).length;
+}
+
+// ---- RENDER ----
+function renderTabs(){
+  const items=[{id:'tareas',l:'Tareas'},{id:'reportes',l:'Pedidos a reportes'},{id:'notas',l:'Notas rápidas'},{id:'areas',l:'Mis áreas'}];
+  document.getElementById('tabs').innerHTML=items.map(t=>`<div class="tab ${S.tab===t.id?'active':''}" onclick="switchTab('${t.id}')">${t.l}</div>`).join('');
+}
+function switchTab(id){S.tab=id;save();render()}
+
+function taskHTML(t){
+  const vl=vencLabel(t);
+  return `<div class="task-item ${t.done?'done':''}">
+    <div class="check ${t.done?'on':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</div>
+    <div class="task-body">
+      <div class="task-text">${t.text}</div>
+      <div class="task-meta">
+        <span class="pill area">${t.area}</span>
+        <span class="pill ${t.prio}">${t.prio}</span>
+        <span class="pill ${t.done?'completada':'pendiente'}">${t.done?'completada':'pendiente'}</span>
+        ${t.fecha?`<span class="pill pendiente">📅 ${fmtDate(t.fecha)}</span>`:''}
+        ${vl?`<span class="pill ${vl}">${vl==='vencida'?'vencida':'vence hoy'}</span>`:''}
+        ${t.reporte?`<span class="pill reporte">👤 ${t.reporte}</span>`:''}
+      </div>
+    </div>
+    <button class="del-btn" onclick="delTask('${t.id}')">×</button>
+  </div>`;
+}
+
+function filteredTasks(){
+  let tasks=S.tasks;
+  const td=today();
+  if(S.fArea!=='Todas')tasks=tasks.filter(t=>t.area===S.fArea);
+  if(S.fPrio!=='Todas')tasks=tasks.filter(t=>t.prio===S.fPrio);
+  if(S.fEstado==='pendiente')tasks=tasks.filter(t=>!t.done);
+  if(S.fEstado==='completada')tasks=tasks.filter(t=>t.done);
+  if(S.fEstado==='vencida')tasks=tasks.filter(t=>!t.done&&t.fecha&&t.fecha<td);
+  return tasks;
+}
+
+function renderTareas(){
+  const areas=['Todas',...S.areas];
+  const tasks=filteredTasks();
+  const pending=tasks.filter(t=>!t.done);
+  const done=tasks.filter(t=>t.done);
+  return `
+  <div class="card">
+    <div class="add-grid">
+      <input type="text" class="full" id="ti" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter')addTask()">
+      <select id="ta">${S.areas.map(a=>`<option>${a}</option>`).join('')}</select>
+      <select id="tp"><option value="normal">Normal</option><option value="urgente">Urgente</option></select>
+      <input type="date" class="full" id="tf" min="${today()}">
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="addTask()">+ Agregar tarea</button>
+      <button class="btn" onclick="exportExcel()">↓ Exportar a Excel</button>
+    </div>
+  </div>
+  <div class="filters">
+    <span class="lbl">Área:</span>${areas.map(a=>`<div class="ftab ${S.fArea===a?'active':''}" onclick="setF('fArea','${a}')">${a}</div>`).join('')}
+    <span class="lbl" style="margin-left:6px">Prioridad:</span>
+    ${['Todas','urgente','normal'].map(p=>`<div class="ftab ${S.fPrio===p?'active':''}" onclick="setF('fPrio','${p}')">${p==='Todas'?'Todas':p}</div>`).join('')}
+    <span class="lbl" style="margin-left:6px">Estado:</span>
+    ${['Todas','pendiente','completada','vencida'].map(e=>`<div class="ftab ${S.fEstado===e?'active':''}" onclick="setF('fEstado','${e}')">${e==='Todas'?'Todos':e}</div>`).join('')}
+  </div>
+  ${tasks.length===0?`<div class="empty">Sin tareas para los filtros seleccionados.</div>`:''}
+  ${pending.length>0?`<div class="sec-label">Pendientes (${pending.length})</div>${pending.map(taskHTML).join('')}<div style="margin-bottom:1rem"></div>`:''}
+  ${done.length>0?`<div class="sec-label">Completadas (${done.length})</div>${done.map(taskHTML).join('')}`:''}`;
+}
+
+function renderReportes(){
+  return `
+  <div class="card">
+    <div class="add-grid">
+      <input type="text" class="full" id="ri" placeholder="Pedido o instrucción..." onkeydown="if(event.key==='Enter')addReporte()">
+      <select id="rq">${S.reportes.map(r=>`<option>${r}</option>`).join('')}</select>
+      <select id="rp"><option value="normal">Normal</option><option value="urgente">Urgente</option></select>
+      <input type="date" class="full" id="rf" min="${today()}">
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="addReporte()">+ Agregar pedido</button>
+      <button class="btn" onclick="exportExcel()">↓ Exportar a Excel</button>
+    </div>
+  </div>
+  ${S.tasks.filter(t=>t.reporte).length===0?`<div class="empty">Sin pedidos a reportes todavía.</div>`:''}
+  ${S.reportes.map(r=>{
+    const rep=S.tasks.filter(t=>t.reporte===r);
+    if(!rep.length)return '';
+    return `<div class="sec-label">${r} — ${rep.filter(t=>!t.done).length} pendientes</div>${rep.map(taskHTML).join('')}<div style="margin-bottom:1rem"></div>`;
+  }).join('')}`;
+}
+
+function renderNotas(){
+  return `
+  <div class="card">
+    <div class="sec-label" style="margin-bottom:8px">Nueva nota rápida</div>
+    <textarea id="ni" placeholder="Escribí lo que necesitás recordar..."></textarea>
+    <div class="btn-row"><button class="btn primary" onclick="saveNota()">Guardar nota</button></div>
+  </div>
+  ${S.notes.length>0?`<div class="sec-label" style="margin:1rem 0 8px">Guardadas (${S.notes.length})</div>`:''}
+  ${[...S.notes].reverse().map((n,i)=>`
+    <div class="note-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div class="note-text">${n.text}</div>
+        <button class="del-btn" onclick="delNota(${S.notes.length-1-i})">×</button>
+      </div>
+      <div class="note-time">${new Date(n.ts).toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'})} · ${fmt(n.ts)}</div>
+    </div>`).join('')}
+  ${S.notes.length===0?`<div class="empty">Sin notas guardadas.</div>`:''}`;
+}
+
+function renderAreas(){
+  return `
+  <div class="card">
+    <div class="sec-label" style="margin-bottom:10px">Áreas a cargo</div>
+    <div class="area-manage">
+      ${S.areas.map((a,i)=>`<div class="area-chip">${a}<button onclick="delArea(${i})">×</button></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="an" placeholder="Nueva área..." style="width:180px">
+      <button class="btn" onclick="addArea()">+ Agregar área</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label" style="margin-bottom:10px">Reportes directos</div>
+    <div class="area-manage">
+      ${S.reportes.map((r,i)=>`<div class="area-chip">${r}<button onclick="delReporte(${i})">×</button></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="rn" placeholder="Nombre del reporte..." style="width:180px">
+      <button class="btn" onclick="addReporteNombre()">+ Agregar reporte</button>
+    </div>
+  </div>`;
+}
+
+function render(){
+  renderTabs();updateStats();
+  const el=document.getElementById('content');
+  if(S.tab==='tareas')el.innerHTML=renderTareas();
+  else if(S.tab==='reportes')el.innerHTML=renderReportes();
+  else if(S.tab==='notas')el.innerHTML=renderNotas();
+  else el.innerHTML=renderAreas();
+}
+
+function setF(k,v){S[k]=v;save();render()}
+function addTask(){
+  const t=document.getElementById('ti').value.trim();if(!t)return;
+  S.tasks.push({id:uid(),text:t,area:document.getElementById('ta').value,prio:document.getElementById('tp').value,fecha:document.getElementById('tf').value||'',done:false,ts:Date.now(),reporte:null});
+  document.getElementById('ti').value='';document.getElementById('tf').value='';save();render();
+}
+function addReporte(){
+  const t=document.getElementById('ri').value.trim();if(!t)return;
+  S.tasks.push({id:uid(),text:t,area:S.areas[0]||'General',prio:document.getElementById('rp').value,fecha:document.getElementById('rf').value||'',done:false,ts:Date.now(),reporte:document.getElementById('rq').value});
+  document.getElementById('ri').value='';document.getElementById('rf').value='';save();render();
+}
+function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t)t.done=!t.done;save();render()}
+function delTask(id){S.tasks=S.tasks.filter(x=>x.id!==id);save();render()}
+function saveNota(){const inp=document.getElementById('ni');const t=inp.value.trim();if(!t)return;S.notes.push({id:uid(),text:t,ts:Date.now()});inp.value='';save();render()}
+function delNota(i){S.notes.splice(i,1);save();render()}
+function addArea(){const inp=document.getElementById('an');const v=inp.value.trim();if(!v||S.areas.includes(v))return;S.areas.push(v);inp.value='';save();render()}
+function delArea(i){S.areas.splice(i,1);save();render()}
+function addReporteNombre(){const inp=document.getElementById('rn');const v=inp.value.trim();if(!v||S.reportes.includes(v))return;S.reportes.push(v);inp.value='';save();render()}
+function delReporte(i){S.reportes.splice(i,1);save();render()}
+
+function exportExcel(){
+  const td=today();
+  const rows=S.tasks.map(t=>({'Tarea':t.text,'Área':t.area,'Prioridad':t.prio,'Estado':t.done?'Completada':'Pendiente','Fecha límite':t.fecha?fmtDate(t.fecha):'Sin fecha','Vencimiento':!t.done&&t.fecha&&t.fecha<td?'Vencida':(!t.done&&t.fecha===td?'Vence hoy':'Ok'),'Reporte':t.reporte||'—','Creada':new Date(t.ts).toLocaleString('es-AR')}));
+  const notasRows=S.notes.map(n=>({'Nota':n.text,'Fecha/Hora':new Date(n.ts).toLocaleString('es-AR')}));
+  const wb=XLSX.utils.book_new();
+  const ws1=XLSX.utils.json_to_sheet(rows.length?rows:[{'Tarea':'Sin tareas'}]);
+  const ws2=XLSX.utils.json_to_sheet(notasRows.length?notasRows:[{'Nota':'Sin notas'}]);
+  ws1['!cols']=[{wch:40},{wch:15},{wch:12},{wch:14},{wch:14},{wch:14},{wch:12},{wch:20}];
+  ws2['!cols']=[{wch:60},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,ws1,'Tareas');
+  XLSX.utils.book_append_sheet(wb,ws2,'Notas');
+  XLSX.writeFile(wb,`dia_laboral_${td}.xlsx`);
+}
+
+checkInit();
+</script>
+</body>
+</html>
