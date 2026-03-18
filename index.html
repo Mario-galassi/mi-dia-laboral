@@ -238,6 +238,20 @@ input[type=date]{color-scheme:dark}
 .note-text{font-size:14px;color:var(--text);line-height:1.55;white-space:pre-wrap;word-break:break-word;font-weight:500}
 .note-time{font-size:11px;color:var(--text3);margin-top:6px;font-weight:600}
 
+/* VOICE */
+.voice-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid var(--border2);border-radius:var(--radius-xl);font-size:13px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);font-family:var(--font);transition:all .18s;white-space:nowrap}
+.voice-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border3)}
+.voice-btn.recording{background:rgba(248,113,113,0.15);color:var(--red);border-color:rgba(248,113,113,0.4);animation:vpulse 1.2s ease-in-out infinite}
+@keyframes vpulse{0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.3)}50%{box-shadow:0 0 0 6px rgba(248,113,113,0)}}
+.voice-dot{width:10px;height:10px;border-radius:50%;background:currentColor;flex-shrink:0}
+.voice-status{font-size:12px;color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);font-weight:500;margin-top:6px;min-height:32px;display:flex;align-items:center;gap:6px}
+.voice-status.ok{color:var(--green);border-color:rgba(16,185,129,0.3);background:var(--green-bg)}
+.voice-status.err{color:var(--red);border-color:rgba(248,113,113,0.3);background:var(--red-bg)}
+.whisper-setup{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem;margin-bottom:.75rem}
+.whisper-setup p{font-size:13px;color:var(--text2);margin-bottom:8px;line-height:1.6;font-weight:500}
+.whisper-setup a{color:var(--accent2);text-decoration:none}
+.whisper-setup a:hover{text-decoration:underline}
+
 @media(max-width:520px){
   .stats,.r-grid{grid-template-columns:repeat(2,1fr)}
   .add-grid,.modal-grid{grid-template-columns:1fr}
@@ -625,8 +639,10 @@ function renderTareas(){
     </div>
     <div class="btn-row">
       <button class="btn primary" onclick="addTask()">+ Agregar tarea</button>
-      <button class="btn" onclick="exportExcel()">↓ Exportar a Excel</button>
+      ${WCFG.apiKey?`<button class="voice-btn" id="voice-btn-tarea" onclick="toggleVoice('tarea')"><div class="voice-dot"></div><span id="voice-lbl-tarea">🎙 Tarea por voz</span></button>`:`<button class="btn" onclick="switchTab('notas')" title="Configurá Whisper en Notas para usar voz">🎙 Activar voz</button>`}
+      <button class="btn" onclick="exportExcel()">↓ Excel</button>
     </div>
+    <div class="voice-status" id="voice-status-tarea" style="display:none"></div>
   </div>
   <div class="filters">
     <span class="lbl">Área:</span>${areas.map(a=>`<div class="ftab ${S.fArea===a?'active':''}" onclick="setF('fArea','${a}')">${esc(a)}</div>`).join('')}
@@ -754,9 +770,23 @@ function tickP(){
 }
 
 function renderNotas(){
+  const hasKey=!!WCFG.apiKey;
   return `<div class="card">
     <div class="sec-label" style="margin-bottom:8px">Nueva nota rápida</div>
-    <textarea id="ni" placeholder="Escribí lo que necesitás recordar..."></textarea>
+    ${!hasKey?`<div class="whisper-setup">
+      <p>Para usar notas de voz necesitás una clave de <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a> (Whisper API). Costo: ~$0.006 USD/min.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="text" id="wkey-input" placeholder="sk-..." style="flex:1;min-width:180px">
+        <button class="btn primary" onclick="saveWhisperKey()">Guardar clave</button>
+      </div>
+    </div>`:`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+      <button class="voice-btn" id="voice-btn-nota" onclick="toggleVoice('nota')">
+        <div class="voice-dot"></div><span id="voice-lbl-nota">🎙 Grabar nota de voz</span>
+      </button>
+      <button class="btn sm" onclick="clearWhisperKey()" style="color:var(--text3)">Cambiar clave</button>
+    </div>
+    <div class="voice-status" id="voice-status-nota" style="display:none"></div>`}
+    <textarea id="ni" placeholder="Escribí o dictá lo que necesitás recordar..."></textarea>
     <div class="btn-row"><button class="btn primary" onclick="saveNota()">Guardar nota</button></div>
   </div>
   ${S.notes.length?`<div class="sec-label" style="margin:1rem 0 8px">Guardadas (${S.notes.length})</div>`:''}
@@ -767,7 +797,7 @@ function renderNotas(){
     </div>
     <div class="note-time">${new Date(n.ts).toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'})} · ${fmt(n.ts)}</div>
   </div>`).join('')}
-  ${!S.notes.length?`<div class="empty" style="margin-top:1rem">Sin notas guardadas.</div>`:''}`;
+  ${!S.notes.length?`<div class="empty" style="margin-top:1rem">Sin notas guardadas.</div>`:'`}`;
 }
 
 function renderAreas(){
@@ -835,6 +865,103 @@ function initApp(){
   if(S.foco) document.getElementById('btn-foco').classList.add('active');
   if(S.notifEnabled) document.getElementById('btn-notif').classList.add('active');
   calToday();
+}
+
+// ── WHISPER CONFIG ──
+const WCFGKEY='dia_whisper_cfg';
+let WCFG=JSON.parse(localStorage.getItem(WCFGKEY)||'{}');
+function saveWhisperKey(){
+  const k=document.getElementById('wkey-input').value.trim();
+  if(!k||!k.startsWith('sk-'))return alert('La clave debe empezar con sk-');
+  WCFG.apiKey=k; localStorage.setItem(WCFGKEY,JSON.stringify(WCFG)); render();
+}
+function clearWhisperKey(){ WCFG={}; localStorage.removeItem(WCFGKEY); render(); }
+
+// ── WHISPER VOICE RECORDING ──
+let mediaRec=null, audioChunks=[], isRecording=false, recTarget=null;
+
+function toggleVoice(target){
+  if(isRecording){ stopVoice(); return; }
+  startVoice(target);
+}
+
+async function startVoice(target){
+  if(!WCFG.apiKey)return;
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioChunks=[];
+    mediaRec=new MediaRecorder(stream,{mimeType:getSupportedMime()});
+    mediaRec.ondataavailable=e=>{ if(e.data.size>0)audioChunks.push(e.data); };
+    mediaRec.onstop=()=>{ stream.getTracks().forEach(t=>t.stop()); transcribeAudio(target); };
+    mediaRec.start(200);
+    isRecording=true; recTarget=target;
+    setVoiceUI(target,true,'Grabando... tocá para detener');
+  }catch(e){
+    setVoiceStatus(target,'err','No se pudo acceder al micrófono: '+e.message);
+  }
+}
+
+function stopVoice(){
+  if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();
+  isRecording=false;
+  setVoiceUI(recTarget,false,'Procesando...');
+}
+
+function getSupportedMime(){
+  const types=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];
+  return types.find(t=>MediaRecorder.isTypeSupported(t))||'audio/webm';
+}
+
+function setVoiceUI(target,rec,msg){
+  const btn=document.getElementById(`voice-btn-${target}`);
+  const lbl=document.getElementById(`voice-lbl-${target}`);
+  if(!btn)return;
+  btn.classList.toggle('recording',rec);
+  if(lbl)lbl.textContent=rec?'⏹ Detener grabación':'🎙 '+(target==='nota'?'Grabar nota de voz':'Tarea por voz');
+  setVoiceStatus(target,'',msg);
+}
+
+function setVoiceStatus(target,cls,msg){
+  const el=document.getElementById(`voice-status-${target}`);
+  if(!el)return;
+  if(!msg){el.style.display='none';return;}
+  el.style.display='flex'; el.className='voice-status'+(cls?' '+cls:'');
+  el.innerHTML=`<span>${msg}</span>`;
+}
+
+async function transcribeAudio(target){
+  if(!audioChunks.length){setVoiceStatus(target,'err','Sin audio grabado.');return;}
+  const mime=audioChunks[0].type||'audio/webm';
+  const ext=mime.includes('ogg')?'ogg':mime.includes('mp4')?'mp4':'webm';
+  const blob=new Blob(audioChunks,{type:mime});
+  if(blob.size<500){setVoiceStatus(target,'err','Audio demasiado corto. Intentá de nuevo.');return;}
+  setVoiceStatus(target,'','Transcribiendo con Whisper...');
+  try{
+    const form=new FormData();
+    form.append('file',blob,`audio.${ext}`);
+    form.append('model','whisper-1');
+    form.append('language','es');
+    const r=await fetch('https://api.openai.com/v1/audio/transcriptions',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+WCFG.apiKey},
+      body:form
+    });
+    if(!r.ok){const err=await r.json();throw new Error(err.error?.message||r.statusText);}
+    const d=await r.json();
+    const text=(d.text||'').trim();
+    if(!text){setVoiceStatus(target,'err','No se detectó texto. Hablá más cerca del micrófono.');return;}
+    if(target==='nota'){
+      const ta=document.getElementById('ni');
+      if(ta)ta.value=(ta.value?ta.value+' ':'')+text;
+      setVoiceStatus(target,'ok','✓ Transcripto. Revisá el texto y guardá.');
+    } else {
+      const ti=document.getElementById('ti');
+      if(ti)ti.value=text;
+      setVoiceStatus(target,'ok','✓ Transcripto. Revisá y agregá la tarea.');
+    }
+  }catch(e){
+    setVoiceStatus(target,'err','Error Whisper: '+e.message);
+  }
 }
 
 function checkInit(){ if(CFG.apiKey&&CFG.binId||CFG.skipped) initApp(); else document.getElementById('setup-panel').style.display='block' }
