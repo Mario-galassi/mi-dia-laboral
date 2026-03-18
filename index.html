@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,7 +6,7 @@
 <title>Mi Día Laboral</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  :root{--bg:#f5f4f0;--surface:#ffffff;--surface2:#f0efe9;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);--text:#1a1a18;--text2:#6b6b65;--text3:#a0a09a;--radius:8px;--radius-lg:12px}
+  :root{--bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);--text:#1a1a18;--text2:#6b6b65;--text3:#a0a09a;--radius:8px;--radius-lg:12px}
   @media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--surface:#242420;--surface2:#2e2e2a;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0efe9;--text2:#a0a09a;--text3:#6b6b65}input[type=date]{color-scheme:dark}}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
@@ -15,6 +14,10 @@
   .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
   .header h1{font-size:22px;font-weight:600;letter-spacing:-.02em}
   .header .date{font-size:13px;color:var(--text2);margin-top:3px}
+  .header-right{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+  .hbtn{padding:6px 12px;border:0.5px solid var(--border2);border-radius:100px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2);white-space:nowrap;transition:all .15s}
+  .hbtn:hover{background:var(--surface2);color:var(--text)}
+  .hbtn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
   .sync-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:1.25rem;background:var(--surface);flex-wrap:wrap}
   .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
   .sync-dot.ok{background:#1d9e75}.sync-dot.error{background:#e24b4a}.sync-dot.loading{background:#ef9f27;animation:pulse 1s infinite}.sync-dot.offline{background:var(--text3)}
@@ -33,10 +36,10 @@
   .tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
   .tab{padding:7px 16px;border:0.5px solid var(--border2);border-radius:100px;font-size:13px;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap}
   .tab.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-  .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:.5rem}
+  .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:.75rem}
   .add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
   .add-grid .full{grid-column:1/-1}
-  input[type=text],input[type=date],input[type=url],select,textarea{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;background:var(--surface2);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
+  input[type=text],input[type=date],input[type=url],input[type=number],select,textarea{width:100%;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);font-size:14px;background:var(--surface2);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
   input:focus,select:focus,textarea:focus{border-color:var(--text)}
   textarea{resize:vertical;min-height:64px;line-height:1.6}
   .btn-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
@@ -45,6 +48,8 @@
   .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
   .btn.primary:hover{opacity:.85}
   .btn.sm{padding:5px 10px;font-size:12px}
+  .btn.danger{color:#a32d2d;border-color:rgba(162,45,45,.3)}
+  .btn.danger:hover{background:#fff0f0}
   .filters{display:flex;gap:5px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
   .filters .lbl{font-size:12px;color:var(--text3);margin-right:2px}
   .ftab{padding:4px 11px;border:0.5px solid var(--border);border-radius:100px;font-size:12px;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap}
@@ -53,6 +58,7 @@
   .task-item{border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;background:var(--surface)}
   .task-item.done{opacity:.4}
   .task-item.done .task-text{text-decoration:line-through}
+  .task-item.foco-hoy{border-color:rgba(239,159,39,.5)}
   .task-main{display:flex;align-items:flex-start;gap:10px;padding:10px 12px}
   .check{width:20px;height:20px;border:0.5px solid var(--border2);border-radius:5px;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--surface2);color:var(--text);transition:all .15s}
   .check.on{background:var(--text);color:var(--bg);border-color:var(--text)}
@@ -63,10 +69,10 @@
   .pill.urgente{background:#fff0ed;color:#b93000;border-color:#f5c4a8}
   .pill.normal{background:#edf4ff;color:#1a5ea8;border-color:#b5d4f4}
   .pill.completada{background:#edfaf3;color:#0f6e56;border-color:#9fe1cb}
-  .pill.pendiente{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+  .pill.pendiente,.pill.extra,.pill.area,.pill.reporte{background:var(--surface2);color:var(--text2);border-color:var(--border)}
   .pill.vencida{background:#fff0f0;color:#a32d2d;border-color:#f7c1c1}
   .pill.hoy{background:#fef8ec;color:#854f0b;border-color:#fac775}
-  .pill.area,.pill.reporte,.pill.extra{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+  .pill.recurrente{background:#edf4ff;color:#185fa5;border-color:#b5d4f4}
   .task-actions{display:flex;gap:2px;align-items:flex-start;flex-shrink:0}
   .icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;line-height:1;padding:3px 5px;border-radius:4px;transition:all .15s}
   .icon-btn:hover{color:var(--text);background:var(--surface2)}
@@ -88,6 +94,42 @@
   .link-display a:hover{text-decoration:underline}
   .link-row{display:flex;gap:6px;align-items:center}
   .link-row input{font-size:13px;padding:6px 10px}
+  /* POMODORO */
+  .pomo-wrap{text-align:center;padding:1.5rem 1rem}
+  .pomo-ring{width:160px;height:160px;border-radius:50%;border:4px solid var(--border);margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;position:relative;background:var(--surface)}
+  .pomo-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+  .pomo-ring circle{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+  .pomo-time{font-size:36px;font-weight:600;letter-spacing:-.04em;position:relative;z-index:1}
+  .pomo-label{font-size:12px;color:var(--text2);margin-top:4px;position:relative;z-index:1}
+  .pomo-controls{display:flex;gap:8px;justify-content:center;margin-bottom:1rem}
+  .pomo-sessions{font-size:13px;color:var(--text2);margin-bottom:1rem}
+  .pomo-task-sel{max-width:320px;margin:0 auto;font-size:13px;padding:7px 10px}
+  /* RESUMEN */
+  .resumen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+  .resumen-stat{background:var(--surface2);border-radius:var(--radius);padding:.75rem 1rem;text-align:center}
+  .resumen-n{font-size:28px;font-weight:600}
+  .resumen-l{font-size:11px;color:var(--text2);margin-top:2px}
+  .prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0 12px}
+  .prog-fill{height:100%;background:var(--text);border-radius:3px;transition:width .4s}
+  .prog-fill.green{background:#1d9e75}
+  .resumen-list-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+  .resumen-list-item:last-child{border-bottom:none}
+  /* CARGA */
+  .carga-bar-wrap{margin-bottom:10px}
+  .carga-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+  .carga-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+  .carga-fill{height:100%;border-radius:4px;transition:width .4s}
+  /* MODO FOCO */
+  .foco-banner{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+  .foco-banner span{font-size:13px;color:var(--text2);flex:1}
+  /* NOTIF */
+  .notif-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+  .notif-row:last-child{border-bottom:none}
+  .toggle{width:36px;height:20px;background:var(--border2);border-radius:10px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+  .toggle.on{background:#1d9e75}
+  .toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
+  .toggle.on::after{left:18px}
+  /* MODAL */
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;padding:1rem}
   .modal-overlay.open{display:flex}
   .modal{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:500px;border:0.5px solid var(--border2);max-height:90vh;overflow-y:auto}
@@ -101,13 +143,17 @@
   .note-card{padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface)}
   .note-text{font-size:14px;color:var(--text);line-height:1.5;white-space:pre-wrap;word-break:break-word}
   .note-time{font-size:11px;color:var(--text3);margin-top:5px}
-  @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}.add-grid,.modal-grid{grid-template-columns:1fr}.add-grid .full,.modal-grid .full{grid-column:1}}
+  @media(max-width:480px){.stats,.resumen-grid{grid-template-columns:repeat(2,1fr)}.add-grid,.modal-grid{grid-template-columns:1fr}.add-grid .full,.modal-grid .full{grid-column:1}}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="header">
     <div><h1>Mi día laboral</h1><div class="date" id="fecha"></div></div>
+    <div class="header-right">
+      <button class="hbtn" id="btn-foco" onclick="toggleFoco()">🎯 Modo foco</button>
+      <button class="hbtn" id="btn-notif" onclick="requestNotif()">🔔 Notificaciones</button>
+    </div>
   </div>
 
   <div id="setup-panel" style="display:none">
@@ -156,7 +202,16 @@
       <select id="edit-area"></select>
       <select id="edit-prio"><option value="normal">Normal</option><option value="urgente">Urgente</option></select>
       <input type="date" class="full" id="edit-fecha">
-      <textarea class="full" id="edit-comment" placeholder="Comentario o descripción adicional..." style="min-height:72px"></textarea>
+      <div class="full" style="display:flex;align-items:center;gap:10px;padding:4px 0">
+        <label style="font-size:13px;color:var(--text2);flex:1">Tarea recurrente</label>
+        <select id="edit-recur" style="width:auto">
+          <option value="">No repetir</option>
+          <option value="diaria">Diaria</option>
+          <option value="semanal">Semanal</option>
+          <option value="mensual">Mensual</option>
+        </select>
+      </div>
+      <textarea class="full" id="edit-comment" placeholder="Comentario o descripción adicional..." style="min-height:60px"></textarea>
       <input type="url" class="full" id="edit-link" placeholder="Link adjunto (https://...)">
     </div>
     <div class="btn-row">
@@ -167,16 +222,21 @@
 </div>
 
 <script>
-const LKEY='dia_laboral_v4';
+const LKEY='dia_laboral_v5';
 const CFGKEY='dia_laboral_cfg';
 let CFG=JSON.parse(localStorage.getItem(CFGKEY)||'{}');
 let S=JSON.parse(localStorage.getItem(LKEY)||'null')||{
   areas:['Operaciones','Comercial','RRHH','Finanzas'],
   reportes:['Ana','Carlos','Martín','Sofía'],
   tasks:[],notes:[],
-  tab:'tareas',fArea:'Todas',fPrio:'Todas',fEstado:'Todas'
+  tab:'tareas',fArea:'Todas',fPrio:'Todas',fEstado:'Todas',
+  foco:false,notifEnabled:false
 };
 let editingId=null;
+
+// POMODORO STATE
+let pomoState={running:false,paused:false,mode:'work',timeLeft:25*60,sessions:0,taskId:null,interval:null};
+const POMO_WORK=25*60, POMO_SHORT=5*60, POMO_LONG=15*60;
 
 function saveLocal(){localStorage.setItem(LKEY,JSON.stringify(S))}
 function uid(){return Math.random().toString(36).slice(2,9)}
@@ -185,6 +245,7 @@ function fmtDate(d){if(!d)return '';const[y,m,dd]=d.split('-');return `${dd}/${m
 function today(){return new Date().toISOString().slice(0,10)}
 function vencLabel(t){if(t.done||!t.fecha)return null;const td=today();if(t.fecha<td)return 'vencida';if(t.fecha===td)return 'hoy';return null;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function padZ(n){return String(n).padStart(2,'0')}
 
 document.getElementById('fecha').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
@@ -228,9 +289,60 @@ function initApp(){
   document.getElementById('main-content').style.display='block';
   if(CFG.apiKey&&CFG.binId){document.getElementById('sync-bar').style.display='flex';pullData().then(()=>render());}
   else render();
+  checkRecurring();
+  scheduleNotifCheck();
+  updateFocoBtn();
 }
 function checkInit(){if(CFG.apiKey&&CFG.binId||CFG.skipped)initApp();else document.getElementById('setup-panel').style.display='block';}
 
+// RECURRENTES — genera tareas del día si no existen
+function checkRecurring(){
+  const td=today();
+  const dow=new Date().getDay();
+  S.tasks.filter(t=>t.recur&&!t.done).forEach(t=>{
+    const already=S.tasks.some(x=>x.recurParent===t.id&&x.fecha===td);
+    if(already)return;
+    if(t.recur==='diaria'||(t.recur==='semanal'&&(!t.recurDow||t.recurDow===dow))||(t.recur==='mensual'&&(!t.recurDay||t.recurDay===new Date().getDate()))){
+      S.tasks.push({...t,id:uid(),done:false,ts:Date.now(),fecha:td,recur:'',recurParent:t.id,subtasks:[],comment:'',link:'',expanded:false});
+    }
+  });
+  saveLocal();
+}
+
+// NOTIFICACIONES
+function requestNotif(){
+  if(!('Notification' in window)){alert('Tu navegador no soporta notificaciones.');return;}
+  Notification.requestPermission().then(p=>{
+    if(p==='granted'){S.notifEnabled=true;save();alert('Notificaciones activadas. Te avisaremos cuando una tarea venza hoy.');document.getElementById('btn-notif').classList.add('active');}
+    else{alert('Permiso denegado. Activá las notificaciones desde la configuración del navegador.');}
+  });
+}
+function scheduleNotifCheck(){
+  checkNotifs();
+  setInterval(checkNotifs,5*60*1000);
+}
+function checkNotifs(){
+  if(!S.notifEnabled||Notification.permission!=='granted')return;
+  const td=today();
+  S.tasks.filter(t=>!t.done&&t.fecha===td).forEach(t=>{
+    const key='notif_'+t.id+'_'+td;
+    if(!localStorage.getItem(key)){
+      new Notification('Tarea vence hoy',{body:t.text,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="26" font-size="28">📋</text></svg>'});
+      localStorage.setItem(key,'1');
+    }
+  });
+}
+
+// MODO FOCO
+function toggleFoco(){
+  S.foco=!S.foco;saveLocal();updateFocoBtn();render();
+}
+function updateFocoBtn(){
+  const btn=document.getElementById('btn-foco');
+  if(S.foco)btn.classList.add('active');else btn.classList.remove('active');
+}
+
+// STATS
 function updateStats(){
   const td=today();
   document.getElementById('st-total').textContent=S.tasks.length;
@@ -239,26 +351,26 @@ function updateStats(){
   document.getElementById('st-venc').textContent=S.tasks.filter(t=>!t.done&&t.fecha&&t.fecha<td).length;
 }
 
+// TABS
 function renderTabs(){
-  const items=[{id:'tareas',l:'Tareas'},{id:'reportes',l:'Pedidos a reportes'},{id:'notas',l:'Notas rápidas'},{id:'areas',l:'Mis áreas'}];
+  const items=[{id:'tareas',l:'Tareas'},{id:'reportes',l:'Pedidos a reportes'},{id:'resumen',l:'Resumen del día'},{id:'pomodoro',l:'Pomodoro'},{id:'carga',l:'Carga por reporte'},{id:'notas',l:'Notas'},{id:'areas',l:'Mis áreas'}];
   document.getElementById('tabs').innerHTML=items.map(t=>`<div class="tab ${S.tab===t.id?'active':''}" onclick="switchTab('${t.id}')">${t.l}</div>`).join('');
 }
 function switchTab(id){S.tab=id;save();render()}
 
-// TASK RENDER
+// TASK HTML
 function taskHTML(t){
   const vl=vencLabel(t);
   const subs=t.subtasks||[];
   const subDone=subs.filter(s=>s.done).length;
   const exp=t.expanded||false;
-  return `<div class="task-item ${t.done?'done':''}" id="ti-${t.id}">
+  const focoHoy=S.foco&&t.fecha===today();
+  return `<div class="task-item ${t.done?'done':''} ${focoHoy?'foco-hoy':''}" id="ti-${t.id}">
     <div class="task-main">
       <div class="check ${t.done?'on':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</div>
       <div class="task-body">
         <div class="task-text">${esc(t.text)}</div>
-        <div class="task-meta" id="tm-${t.id}">
-          ${metaInner(t,vl,subs,subDone)}
-        </div>
+        <div class="task-meta" id="tm-${t.id}">${metaInner(t,vl,subs,subDone)}</div>
       </div>
       <div class="task-actions">
         <button class="icon-btn" title="${exp?'Cerrar':'Expandir'}" onclick="toggleExpand('${t.id}')">${exp?'▲':'▼'}</button>
@@ -266,9 +378,7 @@ function taskHTML(t){
         <button class="icon-btn" title="Eliminar" onclick="delTask('${t.id}')">×</button>
       </div>
     </div>
-    <div class="task-expand ${exp?'open':''}" id="te-${t.id}">
-      ${expandInner(t)}
-    </div>
+    <div class="task-expand ${exp?'open':''}" id="te-${t.id}">${expandInner(t)}</div>
   </div>`;
 }
 
@@ -279,9 +389,10 @@ function metaInner(t,vl,subs,subDone){
     ${t.fecha?`<span class="pill extra">📅 ${fmtDate(t.fecha)}</span>`:''}
     ${vl?`<span class="pill ${vl}">${vl==='vencida'?'vencida':'vence hoy'}</span>`:''}
     ${t.reporte?`<span class="pill reporte">👤 ${esc(t.reporte)}</span>`:''}
+    ${t.recur?`<span class="pill recurrente">🔁 ${t.recur}</span>`:''}
     ${subs.length?`<span class="pill extra">${subDone}/${subs.length} subtareas</span>`:''}
-    ${t.comment?`<span class="pill extra">💬 nota</span>`:''}
-    ${t.link?`<span class="pill extra">🔗 link</span>`:''}`;
+    ${t.comment?`<span class="pill extra">💬</span>`:''}
+    ${t.link?`<span class="pill extra">🔗</span>`:''}`;
 }
 
 function expandInner(t){
@@ -293,7 +404,7 @@ function expandInner(t){
         <div class="sub-check ${s.done?'on':''}" onclick="toggleSub('${t.id}',${i})">${s.done?'✓':''}</div>
         <span class="subtask-text ${s.done?'done':''}">${esc(s.text)}</span>
         <button class="icon-btn" style="font-size:12px" onclick="delSub('${t.id}',${i})">×</button>
-      </div>`).join('')||'<div style="font-size:12px;color:var(--text3);padding:4px 0">Sin subtareas todavía</div>'}
+      </div>`).join('')||`<div style="font-size:12px;color:var(--text3);padding:4px 0">Sin subtareas</div>`}
     </div>
     <div class="sub-add">
       <input type="text" id="si-${t.id}" placeholder="Nueva subtarea..." onkeydown="if(event.key==='Enter')addSub('${t.id}')" style="flex:1">
@@ -302,8 +413,8 @@ function expandInner(t){
   </div>
   <div class="expand-section" style="border-top:0.5px solid var(--border);padding-top:10px">
     <div class="sec-label" style="margin-bottom:6px">Comentario</div>
-    <textarea id="ci-${t.id}" placeholder="Notas, contexto o detalles adicionales..." style="min-height:56px;font-size:13px">${esc(t.comment||'')}</textarea>
-    <button class="btn sm" style="margin-top:6px" onclick="saveComment('${t.id}')">Guardar comentario</button>
+    <textarea id="ci-${t.id}" placeholder="Notas o detalles adicionales..." style="min-height:52px;font-size:13px">${esc(t.comment||'')}</textarea>
+    <button class="btn sm" style="margin-top:6px" onclick="saveComment('${t.id}')">Guardar</button>
   </div>
   <div class="expand-section" style="border-top:0.5px solid var(--border);padding-top:10px;margin-bottom:0">
     <div class="sec-label" style="margin-bottom:6px">Link adjunto</div>
@@ -312,119 +423,56 @@ function expandInner(t){
 }
 
 function linkInner(t){
-  if(t.link)return `<div class="link-display">
-    <a href="${esc(t.link)}" target="_blank">🔗 ${esc(t.link)}</a>
-    <button class="icon-btn" style="font-size:12px" onclick="removeLink('${t.id}')">×</button>
-  </div>`;
-  return `<div class="link-row">
-    <input type="url" id="lv-${t.id}" placeholder="https://..." style="flex:1;font-size:13px;padding:6px 10px">
-    <button class="btn sm" onclick="saveLink('${t.id}')">Adjuntar</button>
-  </div>`;
+  if(t.link)return `<div class="link-display"><a href="${esc(t.link)}" target="_blank">🔗 ${esc(t.link)}</a><button class="icon-btn" style="font-size:12px" onclick="removeLink('${t.id}')">×</button></div>`;
+  return `<div class="link-row"><input type="url" id="lv-${t.id}" placeholder="https://..." style="flex:1;font-size:13px;padding:6px 10px"><button class="btn sm" onclick="saveLink('${t.id}')">Adjuntar</button></div>`;
 }
 
-// EXPAND/COLLAPSE
 function toggleExpand(id){
   const t=S.tasks.find(x=>x.id===id);if(!t)return;
   t.expanded=!t.expanded;saveLocal();
-  const te=document.getElementById(`te-${id}`);
-  if(te)te.classList.toggle('open',t.expanded);
-  const btn=document.querySelector(`#ti-${id} .task-actions .icon-btn`);
-  if(btn){btn.textContent=t.expanded?'▲':'▼';btn.title=t.expanded?'Cerrar':'Expandir';}
+  const te=document.getElementById(`te-${id}`);if(te)te.classList.toggle('open',t.expanded);
+  const btn=document.querySelector(`#ti-${id} .task-actions .icon-btn`);if(btn){btn.textContent=t.expanded?'▲':'▼';}
 }
 
-// SUBTASK ACTIONS
-function addSub(tid){
-  const inp=document.getElementById(`si-${tid}`);
-  const txt=inp?inp.value.trim():'';if(!txt)return;
-  const t=S.tasks.find(x=>x.id===tid);if(!t)return;
-  if(!t.subtasks)t.subtasks=[];
-  t.subtasks.push({text:txt,done:false});
-  inp.value='';saveLocal();
-  refreshExpand(tid);refreshMeta(tid);
-  if(CFG.apiKey&&CFG.binId)pushData();
-}
-function toggleSub(tid,idx){
-  const t=S.tasks.find(x=>x.id===tid);if(!t||!t.subtasks)return;
-  t.subtasks[idx].done=!t.subtasks[idx].done;saveLocal();
-  refreshExpand(tid);refreshMeta(tid);
-  if(CFG.apiKey&&CFG.binId)pushData();
-}
-function delSub(tid,idx){
-  const t=S.tasks.find(x=>x.id===tid);if(!t||!t.subtasks)return;
-  t.subtasks.splice(idx,1);saveLocal();
-  refreshExpand(tid);refreshMeta(tid);
-  if(CFG.apiKey&&CFG.binId)pushData();
-}
-function saveComment(tid){
-  const t=S.tasks.find(x=>x.id===tid);if(!t)return;
-  const ta=document.getElementById(`ci-${tid}`);
-  t.comment=ta?ta.value.trim():'';saveLocal();
-  refreshMeta(tid);
-  if(CFG.apiKey&&CFG.binId)pushData();
-}
-function saveLink(tid){
-  const t=S.tasks.find(x=>x.id===tid);if(!t)return;
-  const inp=document.getElementById(`lv-${tid}`);
-  let v=inp?inp.value.trim():'';
-  if(v&&!v.startsWith('http'))v='https://'+v;
-  t.link=v;saveLocal();
-  const li=document.getElementById(`li-${tid}`);
-  if(li)li.innerHTML=linkInner(t);
-  refreshMeta(tid);
-  if(CFG.apiKey&&CFG.binId)pushData();
-}
-function removeLink(tid){
-  const t=S.tasks.find(x=>x.id===tid);if(!t)return;
-  t.link='';saveLocal();
-  const li=document.getElementById(`li-${tid}`);
-  if(li)li.innerHTML=linkInner(t);
-  refreshMeta(tid);
-  if(CFG.apiKey&&CFG.binId)pushData();
-}
-function refreshExpand(tid){
-  const t=S.tasks.find(x=>x.id===tid);if(!t)return;
-  const te=document.getElementById(`te-${tid}`);
-  if(te)te.innerHTML=expandInner(t);
-}
-function refreshMeta(tid){
-  const t=S.tasks.find(x=>x.id===tid);if(!t)return;
-  const tm=document.getElementById(`tm-${tid}`);
-  if(tm)tm.innerHTML=metaInner(t,vencLabel(t),t.subtasks||[],(t.subtasks||[]).filter(s=>s.done).length);
-  updateStats();
-}
+function addSub(tid){const inp=document.getElementById(`si-${tid}`);const txt=inp?inp.value.trim():'';if(!txt)return;const t=S.tasks.find(x=>x.id===tid);if(!t)return;if(!t.subtasks)t.subtasks=[];t.subtasks.push({text:txt,done:false});inp.value='';saveLocal();refreshExpand(tid);refreshMeta(tid);if(CFG.apiKey&&CFG.binId)pushData();}
+function toggleSub(tid,idx){const t=S.tasks.find(x=>x.id===tid);if(!t||!t.subtasks)return;t.subtasks[idx].done=!t.subtasks[idx].done;saveLocal();refreshExpand(tid);refreshMeta(tid);if(CFG.apiKey&&CFG.binId)pushData();}
+function delSub(tid,idx){const t=S.tasks.find(x=>x.id===tid);if(!t||!t.subtasks)return;t.subtasks.splice(idx,1);saveLocal();refreshExpand(tid);refreshMeta(tid);if(CFG.apiKey&&CFG.binId)pushData();}
+function saveComment(tid){const t=S.tasks.find(x=>x.id===tid);if(!t)return;const ta=document.getElementById(`ci-${tid}`);t.comment=ta?ta.value.trim():'';saveLocal();refreshMeta(tid);if(CFG.apiKey&&CFG.binId)pushData();}
+function saveLink(tid){const t=S.tasks.find(x=>x.id===tid);if(!t)return;const inp=document.getElementById(`lv-${tid}`);let v=inp?inp.value.trim():'';if(v&&!v.startsWith('http'))v='https://'+v;t.link=v;saveLocal();const li=document.getElementById(`li-${tid}`);if(li)li.innerHTML=linkInner(t);refreshMeta(tid);if(CFG.apiKey&&CFG.binId)pushData();}
+function removeLink(tid){const t=S.tasks.find(x=>x.id===tid);if(!t)return;t.link='';saveLocal();const li=document.getElementById(`li-${tid}`);if(li)li.innerHTML=linkInner(t);refreshMeta(tid);if(CFG.apiKey&&CFG.binId)pushData();}
+function refreshExpand(tid){const t=S.tasks.find(x=>x.id===tid);if(!t)return;const te=document.getElementById(`te-${tid}`);if(te)te.innerHTML=expandInner(t);}
+function refreshMeta(tid){const t=S.tasks.find(x=>x.id===tid);if(!t)return;const tm=document.getElementById(`tm-${tid}`);if(tm)tm.innerHTML=metaInner(t,vencLabel(t),t.subtasks||[],(t.subtasks||[]).filter(s=>s.done).length);updateStats();}
 
 // EDIT MODAL
 function openEdit(id){
-  const t=S.tasks.find(x=>x.id===id);if(!t)return;
-  editingId=id;
+  const t=S.tasks.find(x=>x.id===id);if(!t)return;editingId=id;
   document.getElementById('edit-text').value=t.text||'';
   document.getElementById('edit-prio').value=t.prio||'normal';
   document.getElementById('edit-fecha').value=t.fecha||'';
   document.getElementById('edit-comment').value=t.comment||'';
   document.getElementById('edit-link').value=t.link||'';
-  const areaEl=document.getElementById('edit-area');
-  areaEl.innerHTML=S.areas.map(a=>`<option ${a===t.area?'selected':''}>${esc(a)}</option>`).join('');
+  document.getElementById('edit-recur').value=t.recur||'';
+  const ae=document.getElementById('edit-area');ae.innerHTML=S.areas.map(a=>`<option ${a===t.area?'selected':''}>${esc(a)}</option>`).join('');
   document.getElementById('edit-modal').classList.add('open');
 }
 function closeModal(){document.getElementById('edit-modal').classList.remove('open');editingId=null;}
 function saveEdit(){
-  if(!editingId)return;
-  const t=S.tasks.find(x=>x.id===editingId);if(!t)return;
+  if(!editingId)return;const t=S.tasks.find(x=>x.id===editingId);if(!t)return;
   t.text=document.getElementById('edit-text').value.trim()||t.text;
   t.area=document.getElementById('edit-area').value;
   t.prio=document.getElementById('edit-prio').value;
   t.fecha=document.getElementById('edit-fecha').value||'';
   t.comment=document.getElementById('edit-comment').value.trim();
-  let lv=document.getElementById('edit-link').value.trim();
-  if(lv&&!lv.startsWith('http'))lv='https://'+lv;
-  t.link=lv;
+  t.recur=document.getElementById('edit-recur').value||'';
+  let lv=document.getElementById('edit-link').value.trim();if(lv&&!lv.startsWith('http'))lv='https://'+lv;t.link=lv;
   closeModal();save();render();
 }
 document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-// FILTERS & RENDER
-function filteredTasks(){
+// FILTER
+function filteredTasks(baseFilter){
   let tasks=S.tasks;const td=today();
+  if(S.foco)tasks=tasks.filter(t=>t.fecha===td||(!t.fecha&&t.prio==='urgente'));
   if(S.fArea!=='Todas')tasks=tasks.filter(t=>t.area===S.fArea);
   if(S.fPrio!=='Todas')tasks=tasks.filter(t=>t.prio===S.fPrio);
   if(S.fEstado==='pendiente')tasks=tasks.filter(t=>!t.done);
@@ -433,17 +481,21 @@ function filteredTasks(){
   return tasks;
 }
 
+// RENDER TAREAS
 function renderTareas(){
   const areas=['Todas',...S.areas];
   const tasks=filteredTasks();
   const pending=tasks.filter(t=>!t.done);
   const done=tasks.filter(t=>t.done);
-  return `<div class="card">
+  const focoBar=S.foco?`<div class="foco-banner"><span>🎯 <strong>Modo foco activo</strong> — mostrando solo tareas de hoy y urgentes sin fecha.</span><button class="btn sm" onclick="toggleFoco()">Desactivar</button></div>`:'';
+  return `${focoBar}<div class="card">
     <div class="add-grid">
       <input type="text" class="full" id="ti" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter')addTask()">
       <select id="ta">${S.areas.map(a=>`<option>${esc(a)}</option>`).join('')}</select>
       <select id="tp"><option value="normal">Normal</option><option value="urgente">Urgente</option></select>
       <input type="date" class="full" id="tf" min="${today()}">
+      <select id="tr" style="font-size:13px"><option value="">Sin repetición</option><option value="diaria">Diaria</option><option value="semanal">Semanal</option><option value="mensual">Mensual</option></select>
+      <div></div>
     </div>
     <div class="btn-row">
       <button class="btn primary" onclick="addTask()">+ Agregar tarea</button>
@@ -462,6 +514,7 @@ function renderTareas(){
   ${done.length>0?`<div class="sec-label">Completadas (${done.length})</div>${done.map(taskHTML).join('')}`:''}`;
 }
 
+// RENDER REPORTES
 function renderReportes(){
   return `<div class="card">
     <div class="add-grid">
@@ -476,12 +529,197 @@ function renderReportes(){
     </div>
   </div>
   ${S.tasks.filter(t=>t.reporte).length===0?`<div class="empty">Sin pedidos a reportes todavía.</div>`:''}
-  ${S.reportes.map(r=>{
-    const rep=S.tasks.filter(t=>t.reporte===r);if(!rep.length)return '';
-    return `<div class="sec-label">${esc(r)} — ${rep.filter(t=>!t.done).length} pendientes</div>${rep.map(taskHTML).join('')}<div style="margin-bottom:1rem"></div>`;
-  }).join('')}`;
+  ${S.reportes.map(r=>{const rep=S.tasks.filter(t=>t.reporte===r);if(!rep.length)return '';return `<div class="sec-label">${esc(r)} — ${rep.filter(t=>!t.done).length} pendientes</div>${rep.map(taskHTML).join('')}<div style="margin-bottom:1rem"></div>`;}).join('')}`;
 }
 
+// RESUMEN DEL DÍA
+function renderResumen(){
+  const td=today();
+  const all=S.tasks;
+  const total=all.length;
+  const done=all.filter(t=>t.done).length;
+  const pending=all.filter(t=>!t.done).length;
+  const urgentes=all.filter(t=>t.prio==='urgente'&&!t.done).length;
+  const vencidas=all.filter(t=>!t.done&&t.fecha&&t.fecha<td).length;
+  const hoy=all.filter(t=>!t.done&&t.fecha===td).length;
+  const pct=total?Math.round(done/total*100):0;
+  const completadasHoy=all.filter(t=>t.done&&t.fecha===td);
+  const pendientesUrgentes=all.filter(t=>!t.done&&t.prio==='urgente').slice(0,5);
+  return `<div class="card">
+    <div class="sec-label" style="margin-bottom:12px">Progreso general</div>
+    <div class="resumen-grid">
+      <div class="resumen-stat"><div class="resumen-n">${done}</div><div class="resumen-l">Completadas</div></div>
+      <div class="resumen-stat"><div class="resumen-n">${pending}</div><div class="resumen-l">Pendientes</div></div>
+      <div class="resumen-stat"><div class="resumen-n">${pct}%</div><div class="resumen-l">Progreso</div></div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill green" style="width:${pct}%"></div></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--text2)">
+      <span>🔴 ${urgentes} urgentes pendientes</span>
+      <span>⏰ ${vencidas} vencidas</span>
+      <span>📅 ${hoy} vencen hoy</span>
+    </div>
+  </div>
+  ${pendientesUrgentes.length?`<div class="card">
+    <div class="sec-label" style="margin-bottom:8px">Urgentes pendientes</div>
+    ${pendientesUrgentes.map(t=>`<div class="resumen-list-item">
+      <span style="font-size:16px">🔴</span>
+      <span style="flex:1">${esc(t.text)}</span>
+      <span style="font-size:11px;color:var(--text3)">${esc(t.area)}</span>
+    </div>`).join('')}
+  </div>`:''}
+  ${completadasHoy.length?`<div class="card">
+    <div class="sec-label" style="margin-bottom:8px">Completadas hoy</div>
+    ${completadasHoy.map(t=>`<div class="resumen-list-item">
+      <span style="font-size:16px">✅</span>
+      <span style="flex:1">${esc(t.text)}</span>
+      <span style="font-size:11px;color:var(--text3)">${esc(t.area)}</span>
+    </div>`).join('')}
+  </div>`:''}
+  <div class="card">
+    <div class="sec-label" style="margin-bottom:8px">Por área</div>
+    ${S.areas.map(a=>{
+      const aTotal=all.filter(t=>t.area===a).length;
+      const aDone=all.filter(t=>t.area===a&&t.done).length;
+      if(!aTotal)return '';
+      const ap=Math.round(aDone/aTotal*100);
+      return `<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>${esc(a)}</span><span style="color:var(--text2)">${aDone}/${aTotal}</span></div>
+        <div class="prog-bar" style="margin:0"><div class="prog-fill" style="width:${ap}%"></div></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// CARGA POR REPORTE
+function renderCarga(){
+  const all=S.tasks.filter(t=>t.reporte);
+  if(!all.length)return `<div class="empty">Sin pedidos asignados a reportes todavía.</div>`;
+  const maxTasks=Math.max(...S.reportes.map(r=>S.tasks.filter(t=>t.reporte===r&&!t.done).length),1);
+  return `<div class="card">
+    <div class="sec-label" style="margin-bottom:12px">Tareas pendientes por persona</div>
+    ${S.reportes.map(r=>{
+      const rep=S.tasks.filter(t=>t.reporte===r);
+      const pending=rep.filter(t=>!t.done).length;
+      const done=rep.filter(t=>t.done).length;
+      const urg=rep.filter(t=>t.prio==='urgente'&&!t.done).length;
+      const pct=maxTasks?Math.round(pending/maxTasks*100):0;
+      const color=pct>75?'#e24b4a':pct>40?'#ef9f27':'#1d9e75';
+      return `<div class="carga-bar-wrap">
+        <div class="carga-header">
+          <span><strong>${esc(r)}</strong>${urg?` <span style="font-size:11px;color:#b93000">🔴 ${urg} urgente${urg>1?'s':''}</span>`:''}</span>
+          <span style="color:var(--text2);font-size:12px">${pending} pendiente${pending!==1?'s':''} · ${done} completada${done!==1?'s':''}</span>
+        </div>
+        <div class="carga-bar"><div class="carga-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div class="card">
+    <div class="sec-label" style="margin-bottom:8px">Detalle por persona</div>
+    ${S.reportes.map(r=>{
+      const rep=S.tasks.filter(t=>t.reporte===r&&!t.done);
+      if(!rep.length)return `<div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:0.5px solid var(--border)">${esc(r)} — sin tareas pendientes</div>`;
+      return `<div style="margin-bottom:12px"><div class="sec-label" style="margin-bottom:6px">${esc(r)}</div>${rep.map(taskHTML).join('')}</div>`;
+    }).join('')}
+  </div>`;
+}
+
+// POMODORO
+function renderPomodoro(){
+  const total=pomoState.mode==='work'?POMO_WORK:(pomoState.sessions%4===3?POMO_LONG:POMO_SHORT);
+  const tl=pomoState.timeLeft;
+  const circ=Math.PI*2*70;
+  const offset=circ*(1-tl/total);
+  const color=pomoState.mode==='work'?'#e24b4a':'#1d9e75';
+  const modeLabel=pomoState.mode==='work'?'Trabajo':(pomoState.sessions%4===3?'Descanso largo':'Descanso corto');
+  const pendingTasks=S.tasks.filter(t=>!t.done);
+  return `<div class="card">
+    <div class="pomo-wrap">
+      <div class="pomo-ring">
+        <svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="70" stroke="var(--border2)" stroke-width="4"/><circle cx="80" cy="80" r="70" stroke="${color}" stroke-width="4" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" id="pomo-circle"/></svg>
+        <div>
+          <div class="pomo-time" id="pomo-time">${padZ(Math.floor(tl/60))}:${padZ(tl%60)}</div>
+          <div class="pomo-label" id="pomo-label">${modeLabel}</div>
+        </div>
+      </div>
+      <div class="pomo-sessions">Sesiones completadas: <strong>${pomoState.sessions}</strong></div>
+      <div class="pomo-controls">
+        ${!pomoState.running||pomoState.paused
+          ?`<button class="btn primary" onclick="startPomo()">▶ ${pomoState.paused?'Continuar':'Iniciar'}</button>`
+          :`<button class="btn" onclick="pausePomo()">⏸ Pausar</button>`}
+        <button class="btn" onclick="resetPomo()">↺ Reiniciar</button>
+        <button class="btn" onclick="skipPomo()">⏭ Saltar</button>
+      </div>
+      <div style="margin-top:1rem;max-width:320px;margin-left:auto;margin-right:auto">
+        <div class="sec-label" style="margin-bottom:6px;text-align:left">Tarea en foco</div>
+        <select class="pomo-task-sel" id="pomo-task" onchange="setPomoTask(this.value)">
+          <option value="">Sin tarea seleccionada</option>
+          ${pendingTasks.map(t=>`<option value="${t.id}" ${pomoState.taskId===t.id?'selected':''}>${esc(t.text.slice(0,50))}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label" style="margin-bottom:8px">Configuración</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px">
+      <div><div style="color:var(--text2);margin-bottom:4px">Trabajo (min)</div><input type="number" value="25" min="1" max="60" id="cfg-work" style="text-align:center" onchange="updatePomoConfig()"></div>
+      <div><div style="color:var(--text2);margin-bottom:4px">Descanso corto</div><input type="number" value="5" min="1" max="30" id="cfg-short" style="text-align:center" onchange="updatePomoConfig()"></div>
+      <div><div style="color:var(--text2);margin-bottom:4px">Descanso largo</div><input type="number" value="15" min="1" max="60" id="cfg-long" style="text-align:center" onchange="updatePomoConfig()"></div>
+    </div>
+  </div>`;
+}
+
+function startPomo(){
+  if(pomoState.interval)clearInterval(pomoState.interval);
+  pomoState.running=true;pomoState.paused=false;
+  pomoState.interval=setInterval(tickPomo,1000);
+}
+function pausePomo(){clearInterval(pomoState.interval);pomoState.paused=true;pomoState.running=false;render();}
+function resetPomo(){clearInterval(pomoState.interval);pomoState.running=false;pomoState.paused=false;pomoState.mode='work';pomoState.timeLeft=POMO_WORK;render();}
+function skipPomo(){clearInterval(pomoState.interval);pomoState.running=false;pomoState.paused=false;nextPomoMode();render();}
+function setPomoTask(id){pomoState.taskId=id||null;}
+function updatePomoConfig(){
+  const w=parseInt(document.getElementById('cfg-work').value)||25;
+  const s=parseInt(document.getElementById('cfg-short').value)||5;
+  const l=parseInt(document.getElementById('cfg-long').value)||15;
+  if(!pomoState.running){
+    if(pomoState.mode==='work')pomoState.timeLeft=w*60;
+    else if(pomoState.sessions%4===3)pomoState.timeLeft=l*60;
+    else pomoState.timeLeft=s*60;
+  }
+}
+function nextPomoMode(){
+  if(pomoState.mode==='work'){
+    pomoState.sessions++;
+    pomoState.mode='break';
+    pomoState.timeLeft=pomoState.sessions%4===0?POMO_LONG:POMO_SHORT;
+  }else{pomoState.mode='work';pomoState.timeLeft=POMO_WORK;}
+}
+function tickPomo(){
+  pomoState.timeLeft--;
+  updatePomoUI();
+  if(pomoState.timeLeft<=0){
+    clearInterval(pomoState.interval);
+    pomoState.running=false;
+    if(S.notifEnabled&&Notification.permission==='granted'){
+      new Notification(pomoState.mode==='work'?'¡Tiempo de descanso!':'¡A trabajar!',{body:pomoState.mode==='work'?'Tomá un descanso.':'Iniciá tu próxima sesión de trabajo.'});
+    }
+    nextPomoMode();render();
+  }
+}
+function updatePomoUI(){
+  const tEl=document.getElementById('pomo-time');
+  const lEl=document.getElementById('pomo-label');
+  const cEl=document.getElementById('pomo-circle');
+  if(!tEl)return;
+  const tl=pomoState.timeLeft;
+  tEl.textContent=`${padZ(Math.floor(tl/60))}:${padZ(tl%60)}`;
+  const total=pomoState.mode==='work'?POMO_WORK:(pomoState.sessions%4===3?POMO_LONG:POMO_SHORT);
+  const circ=Math.PI*2*70;
+  if(cEl)cEl.style.strokeDashoffset=circ*(1-tl/total);
+  if(lEl)lEl.textContent=pomoState.mode==='work'?'Trabajo':(pomoState.sessions%4===3?'Descanso largo':'Descanso corto');
+}
+
+// NOTAS
 function renderNotas(){
   return `<div class="card">
     <div class="sec-label" style="margin-bottom:8px">Nueva nota rápida</div>
@@ -499,6 +737,7 @@ function renderNotas(){
   ${S.notes.length===0?`<div class="empty" style="margin-top:1rem">Sin notas guardadas.</div>`:''}`;
 }
 
+// ÁREAS
 function renderAreas(){
   return `<div class="card">
     <div class="sec-label" style="margin-bottom:10px">Áreas a cargo</div>
@@ -518,10 +757,15 @@ function renderAreas(){
   </div>`;
 }
 
-function render(){renderTabs();updateStats();
+// MAIN RENDER
+function render(){
+  renderTabs();updateStats();
   const el=document.getElementById('content');
   if(S.tab==='tareas')el.innerHTML=renderTareas();
   else if(S.tab==='reportes')el.innerHTML=renderReportes();
+  else if(S.tab==='resumen')el.innerHTML=renderResumen();
+  else if(S.tab==='pomodoro')el.innerHTML=renderPomodoro();
+  else if(S.tab==='carga')el.innerHTML=renderCarga();
   else if(S.tab==='notas')el.innerHTML=renderNotas();
   else el.innerHTML=renderAreas();
 }
@@ -529,12 +773,12 @@ function render(){renderTabs();updateStats();
 function setF(k,v){S[k]=v;save();render()}
 function addTask(){
   const t=document.getElementById('ti').value.trim();if(!t)return;
-  S.tasks.push({id:uid(),text:t,area:document.getElementById('ta').value,prio:document.getElementById('tp').value,fecha:document.getElementById('tf').value||'',done:false,ts:Date.now(),reporte:null,subtasks:[],comment:'',link:'',expanded:false});
+  S.tasks.push({id:uid(),text:t,area:document.getElementById('ta').value,prio:document.getElementById('tp').value,fecha:document.getElementById('tf').value||'',recur:document.getElementById('tr').value||'',done:false,ts:Date.now(),reporte:null,subtasks:[],comment:'',link:'',expanded:false});
   document.getElementById('ti').value='';document.getElementById('tf').value='';save();render();
 }
 function addReporte(){
   const t=document.getElementById('ri').value.trim();if(!t)return;
-  S.tasks.push({id:uid(),text:t,area:S.areas[0]||'General',prio:document.getElementById('rp').value,fecha:document.getElementById('rf').value||'',done:false,ts:Date.now(),reporte:document.getElementById('rq').value,subtasks:[],comment:'',link:'',expanded:false});
+  S.tasks.push({id:uid(),text:t,area:S.areas[0]||'General',prio:document.getElementById('rp').value,fecha:document.getElementById('rf').value||'',recur:'',done:false,ts:Date.now(),reporte:document.getElementById('rq').value,subtasks:[],comment:'',link:'',expanded:false});
   document.getElementById('ri').value='';document.getElementById('rf').value='';save();render();
 }
 function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t)t.done=!t.done;save();render()}
@@ -548,22 +792,12 @@ function delReporte(i){S.reportes.splice(i,1);save();render()}
 
 function exportExcel(){
   const td=today();
-  const rows=S.tasks.map(t=>{
-    const subs=t.subtasks||[];
-    return {'Tarea':t.text,'Área':t.area,'Prioridad':t.prio,'Estado':t.done?'Completada':'Pendiente',
-      'Fecha límite':t.fecha?fmtDate(t.fecha):'Sin fecha',
-      'Vencimiento':!t.done&&t.fecha&&t.fecha<td?'Vencida':(!t.done&&t.fecha===td?'Vence hoy':'Ok'),
-      'Reporte':t.reporte||'—',
-      'Subtareas':subs.length?subs.map(s=>(s.done?'[x] ':'[ ] ')+s.text).join(' | '):'—',
-      'Subtareas completadas':subs.length?`${subs.filter(s=>s.done).length}/${subs.length}`:'—',
-      'Comentario':t.comment||'—','Link':t.link||'—',
-      'Creada':new Date(t.ts).toLocaleString('es-AR')};
-  });
+  const rows=S.tasks.map(t=>{const subs=t.subtasks||[];return{'Tarea':t.text,'Área':t.area,'Prioridad':t.prio,'Estado':t.done?'Completada':'Pendiente','Fecha límite':t.fecha?fmtDate(t.fecha):'Sin fecha','Vencimiento':!t.done&&t.fecha&&t.fecha<td?'Vencida':(!t.done&&t.fecha===td?'Vence hoy':'Ok'),'Recurrencia':t.recur||'—','Reporte':t.reporte||'—','Subtareas':subs.length?subs.map(s=>(s.done?'[x] ':'[ ] ')+s.text).join(' | '):'—','Progreso subtareas':subs.length?`${subs.filter(s=>s.done).length}/${subs.length}`:'—','Comentario':t.comment||'—','Link':t.link||'—','Creada':new Date(t.ts).toLocaleString('es-AR')};});
   const notasRows=S.notes.map(n=>({'Nota':n.text,'Fecha/Hora':new Date(n.ts).toLocaleString('es-AR')}));
   const wb=XLSX.utils.book_new();
   const ws1=XLSX.utils.json_to_sheet(rows.length?rows:[{'Tarea':'Sin tareas'}]);
   const ws2=XLSX.utils.json_to_sheet(notasRows.length?notasRows:[{'Nota':'Sin notas'}]);
-  ws1['!cols']=[{wch:40},{wch:15},{wch:12},{wch:14},{wch:14},{wch:12},{wch:12},{wch:50},{wch:20},{wch:30},{wch:40},{wch:20}];
+  ws1['!cols']=[{wch:40},{wch:15},{wch:12},{wch:14},{wch:14},{wch:12},{wch:12},{wch:12},{wch:50},{wch:18},{wch:30},{wch:40},{wch:20}];
   ws2['!cols']=[{wch:60},{wch:20}];
   XLSX.utils.book_append_sheet(wb,ws1,'Tareas');
   XLSX.utils.book_append_sheet(wb,ws2,'Notas');
