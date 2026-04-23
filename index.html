@@ -287,7 +287,9 @@ input[type=date]{color-scheme:dark}
     <span class="sync-txt" id="sync-txt">Sin sincronizar</span>
     <button class="sync-btn" onclick="syncNow()">↻ Sincronizar</button>
     <button class="sync-btn" onclick="resetConfig()">Config.</button>
+    <button class="sync-btn" onclick="toggleDiag()">🔍 Diag</button>
   </div>
+  <div id="diag-panel" style="display:none;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;font-size:12px;font-family:monospace;color:var(--text2);word-break:break-all;line-height:1.8"></div>
 
   <div id="main-content" style="display:none">
     <div class="stats">
@@ -421,6 +423,36 @@ async function connectExisting(){
 }
 async function saveApiKey(){ const k=document.getElementById('api-key-input').value.trim(); if(!k)return alert('Pegá tu Master Key'); CFG.apiKey=k; const bid=await createBin(); if(!bid)return alert('No se pudo conectar. Verificá que la clave sea correcta.'); CFG.binId=bid; localStorage.setItem(CFGKEY,JSON.stringify(CFG)); initApp() }
 function skipSetup(){ CFG.skipped=true; localStorage.setItem(CFGKEY,JSON.stringify(CFG)); initApp() }
+function toggleDiag(){
+  const el=document.getElementById('diag-panel');
+  if(el.style.display!=='none'){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML='Ejecutando diagnóstico...';
+  const lines=[];
+  lines.push('--- CONFIG ---');
+  lines.push('binId: '+(CFG.binId||'NO HAY'));
+  lines.push('apiKey: '+(CFG.apiKey?CFG.apiKey.slice(0,10)+'...':'NO HAY'));
+  lines.push('--- LOCAL ---');
+  lines.push('lastModified: '+new Date(S.lastModified||0).toLocaleString('es-AR'));
+  lines.push('tareas: '+S.tasks.length);
+  lines.push('notas: '+S.notes.length);
+  lines.push('--- REMOTO ---');
+  el.innerHTML=lines.join('<br>')+'<br>Consultando JSONBin...';
+  fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}/latest`,{headers:{'X-Master-Key':CFG.apiKey}})
+    .then(r=>{lines.push('HTTP status: '+r.status); return r.json()})
+    .then(d=>{
+      if(d.record){
+        lines.push('lastModified remoto: '+new Date(d.record.lastModified||0).toLocaleString('es-AR'));
+        lines.push('tareas remotas: '+(d.record.tasks?.length??'?'));
+        lines.push('notas remotas: '+(d.record.notes?.length??'?'));
+        lines.push('¿Local más nuevo? '+((S.lastModified||0)>(d.record.lastModified||0)?'SÍ':'NO'));
+      } else {
+        lines.push('Respuesta: '+JSON.stringify(d).slice(0,200));
+      }
+      el.innerHTML=lines.join('<br>');
+    })
+    .catch(e=>{lines.push('ERROR: '+e.message); el.innerHTML=lines.join('<br>');});
+}
 function resetConfig(){ if(confirm('¿Reconfigurar sincronización?')){ CFG={}; localStorage.removeItem(CFGKEY); location.reload() } }
 async function syncNow(){ await pull(); render(); await push() }
 async function save(){ sl(); if(CFG.apiKey&&CFG.binId) await push() }
