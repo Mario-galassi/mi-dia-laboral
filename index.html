@@ -272,6 +272,13 @@ input[type=date]{color-scheme:dark}
         <button class="btn primary" onclick="saveApiKey()">Guardar y conectar</button>
         <button class="btn" onclick="skipSetup()">Usar sin sincronización</button>
       </div>
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <p style="margin-bottom:8px">¿Ya tenés un Bin existente? Conectá este dispositivo a uno existente:</p>
+        <input type="text" id="existing-binid-input" placeholder="BinId (ej: 64abc123...)" style="margin-bottom:8px">
+        <div class="btn-row" style="margin-top:0">
+          <button class="btn" onclick="connectExisting()">Conectar a Bin existente</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -403,6 +410,15 @@ async function pull(){
 }
 
 async function createBin(){ try{ const r=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Name':'MiDiaLaboral'},body:JSON.stringify(S)}); if(!r.ok)throw 0; return(await r.json()).metadata.id; }catch(e){return null} }
+async function connectExisting(){
+  const k=document.getElementById('api-key-input').value.trim();
+  const bid=document.getElementById('existing-binid-input').value.trim();
+  if(!k)return alert('Pegá tu Master Key primero');
+  if(!bid)return alert('Pegá el BinId del dispositivo principal');
+  CFG.apiKey=k; CFG.binId=bid;
+  localStorage.setItem(CFGKEY,JSON.stringify(CFG));
+  initApp();
+}
 async function saveApiKey(){ const k=document.getElementById('api-key-input').value.trim(); if(!k)return alert('Pegá tu Master Key'); CFG.apiKey=k; const bid=await createBin(); if(!bid)return alert('No se pudo conectar. Verificá que la clave sea correcta.'); CFG.binId=bid; localStorage.setItem(CFGKEY,JSON.stringify(CFG)); initApp() }
 function skipSetup(){ CFG.skipped=true; localStorage.setItem(CFGKEY,JSON.stringify(CFG)); initApp() }
 function resetConfig(){ if(confirm('¿Reconfigurar sincronización?')){ CFG={}; localStorage.removeItem(CFGKEY); location.reload() } }
