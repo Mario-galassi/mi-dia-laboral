@@ -42,14 +42,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
 
-/* scrollbar */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
 
 .app{max-width:800px;margin:0 auto;padding:1.5rem 1rem 4rem}
 
-/* HEADER */
 .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:10px}
 .header h1{font-size:24px;font-weight:700;letter-spacing:-.02em;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .header .date{font-size:13px;color:var(--text2);margin-top:3px;font-weight:500}
@@ -58,7 +56,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .hbtn:hover{background:var(--surface2);color:var(--text);border-color:var(--border3)}
 .hbtn.active{background:var(--accent-bg);color:var(--accent2);border-color:var(--accent-border)}
 
-/* SYNC BAR */
 .sync-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.25rem;background:var(--surface);flex-wrap:wrap}
 .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .sync-dot.ok{background:var(--green)}.sync-dot.error{background:var(--red)}.sync-dot.loading{background:var(--amber);animation:pulse 1s infinite}.sync-dot.offline{background:var(--text3)}
@@ -67,7 +64,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sync-btn{padding:5px 12px;border:1px solid var(--border2);border-radius:var(--radius-xl);font-size:12px;cursor:pointer;background:var(--surface2);color:var(--text2);font-family:var(--font);font-weight:600;transition:all .15s}
 .sync-btn:hover{color:var(--text);border-color:var(--border3)}
 
-/* SETUP CARD */
 .setup-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.5rem}
 .setup-card h2{font-size:17px;font-weight:700;margin-bottom:.75rem;color:var(--text)}
 .setup-card p{font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.7}
@@ -75,26 +71,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .setup-card a{color:var(--accent2);text-decoration:none}
 .setup-card a:hover{text-decoration:underline}
 
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.85rem 1rem;text-align:center;transition:border-color .15s}
 .stat:hover{border-color:var(--border2)}
 .stat-n{font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--accent2)}
 .stat-l{font-size:11px;color:var(--text2);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
 
-/* TABS */
 .tabs{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
 .tab{padding:7px 16px;border:1px solid var(--border);border-radius:var(--radius-xl);font-size:13px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .18s;white-space:nowrap;font-family:var(--font)}
 .tab:hover{background:var(--surface2);color:var(--text);border-color:var(--border2)}
 .tab.active{background:var(--accent-bg);color:var(--accent2);border-color:var(--accent-border)}
 
-/* CARDS */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:.75rem;transition:border-color .15s}
 .card:hover{border-color:var(--border2)}
 .add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .add-grid .full{grid-column:1/-1}
 
-/* INPUTS */
 input[type=text],input[type=date],input[type=url],select,textarea{
   width:100%;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--radius);
   font-size:14px;background:var(--surface2);color:var(--text);font-family:var(--font);
@@ -106,7 +98,6 @@ select option{background:var(--surface2)}
 textarea{resize:vertical;min-height:64px;line-height:1.6}
 input[type=date]{color-scheme:dark}
 
-/* BUTTONS */
 .btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .btn{padding:9px 18px;border:1px solid var(--border2);border-radius:var(--radius-xl);font-size:13px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);font-family:var(--font);transition:all .18s;white-space:nowrap}
 .btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border3)}
@@ -114,7 +105,6 @@ input[type=date]{color-scheme:dark}
 .btn.primary:hover{background:#2563eb;border-color:#2563eb}
 .btn.sm{padding:6px 12px;font-size:12px}
 
-/* FILTERS */
 .filters{display:flex;gap:5px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
 .filters .lbl{font-size:11px;color:var(--text3);margin-right:2px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
 .ftab{padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius-xl);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap;font-family:var(--font)}
@@ -123,7 +113,6 @@ input[type=date]{color-scheme:dark}
 
 .sec-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
 
-/* CALENDAR */
 .cal-nav-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;gap:8px}
 .cal-nav-row h2{font-size:16px;font-weight:700;white-space:nowrap;color:var(--text)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:.75rem}
@@ -144,12 +133,10 @@ input[type=date]{color-scheme:dark}
 .cal-legend{display:flex;gap:14px;font-size:11px;color:var(--text2);flex-wrap:wrap;margin-top:4px;font-weight:600}
 .cal-legend span{display:flex;align-items:center;gap:5px}
 
-/* DAY DETAIL */
 .day-detail{border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-top:.75rem;background:var(--surface)}
 .day-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
 .day-detail-header h3{font-size:15px;font-weight:700;color:var(--text)}
 
-/* TASKS */
 .task-item{border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:8px;background:var(--surface);transition:border-color .15s}
 .task-item:hover{border-color:var(--border2)}
 .task-item.done{opacity:.38}
@@ -190,7 +177,6 @@ input[type=date]{color-scheme:dark}
 .link-disp a:hover{text-decoration:underline}
 .link-row{display:flex;gap:6px;align-items:center}
 
-/* POMODORO */
 .pomo-wrap{text-align:center;padding:1rem}
 .pomo-ring{width:168px;height:168px;border-radius:50%;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;position:relative;background:var(--surface2);border:3px solid var(--border)}
 .pomo-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
@@ -199,7 +185,6 @@ input[type=date]{color-scheme:dark}
 .pomo-lbl{font-size:12px;color:var(--text2);margin-top:4px;position:relative;z-index:1;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .pomo-ctrls{display:flex;gap:8px;justify-content:center;margin-bottom:1rem}
 
-/* RESUMEN */
 .r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
 .r-stat{background:var(--surface2);border-radius:var(--radius-lg);padding:.85rem 1rem;text-align:center;border:1px solid var(--border)}
 .r-n{font-size:30px;font-weight:700;color:var(--accent2)}
@@ -211,17 +196,14 @@ input[type=date]{color-scheme:dark}
 .r-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;font-weight:500}
 .r-item:last-child{border-bottom:none}
 
-/* CARGA */
 .carga-bw{margin-bottom:12px}
 .carga-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;font-weight:600}
 .carga-bar{height:8px;background:var(--surface3);border-radius:4px;overflow:hidden}
 .carga-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
 
-/* FOCO */
 .foco-banner{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
 .foco-banner span{font-size:13px;color:var(--accent2);flex:1;font-weight:600}
 
-/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surface);border-radius:var(--radius-lg);padding:1.75rem;width:100%;max-width:500px;border:1px solid var(--border2);max-height:90vh;overflow-y:auto}
@@ -238,7 +220,6 @@ input[type=date]{color-scheme:dark}
 .note-text{font-size:14px;color:var(--text);line-height:1.55;white-space:pre-wrap;word-break:break-word;font-weight:500}
 .note-time{font-size:11px;color:var(--text3);margin-top:6px;font-weight:600}
 
-/* VOICE */
 .voice-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid var(--border2);border-radius:var(--radius-xl);font-size:13px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);font-family:var(--font);transition:all .18s;white-space:nowrap}
 .voice-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border3)}
 .voice-btn.recording{background:rgba(248,113,113,0.15);color:var(--red);border-color:rgba(248,113,113,0.4);animation:vpulse 1.2s ease-in-out infinite}
@@ -276,7 +257,6 @@ input[type=date]{color-scheme:dark}
     </div>
   </div>
 
-  <!-- JSONBIN SETUP -->
   <div id="setup-panel" style="display:none">
     <div class="setup-card">
       <h2>Configurar sincronización entre dispositivos</h2>
@@ -314,7 +294,6 @@ input[type=date]{color-scheme:dark}
   </div>
 </div>
 
-<!-- EDIT MODAL -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <h3>Editar tarea</h3>
@@ -351,13 +330,18 @@ let S = JSON.parse(localStorage.getItem(LKEY)||'null') || {
   tasks:[], notes:[],
   tab:'calendario', fArea:'Todas', fPrio:'Todas', fEstado:'Todas',
   foco:false,
-  calYear:new Date().getFullYear(), calMonth:new Date().getMonth()
+  calYear:new Date().getFullYear(), calMonth:new Date().getMonth(),
+  lastModified: 0
 };
+// Asegurarse de que datos existentes tengan lastModified
+if(!S.lastModified) S.lastModified = 0;
+
 let editingId = null, calSel = null;
 let pomo = {running:false, paused:false, mode:'work', tl:25*60, sess:0, tid:null, iv:null};
 const PW=25*60, PS=5*60, PL=15*60;
 
-function sl(){ localStorage.setItem(LKEY, JSON.stringify(S)) }
+// ── CAMBIO 1: sl() ahora estampa lastModified antes de guardar ──
+function sl(){ S.lastModified = Date.now(); localStorage.setItem(LKEY, JSON.stringify(S)) }
 function uid(){ return Math.random().toString(36).slice(2,9) }
 function fmt(ts){ return new Date(ts).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) }
 function fd(d){ if(!d)return''; const[y,m,dd]=d.split('-'); return`${dd}/${m}/${y}` }
@@ -370,8 +354,54 @@ document.getElementById('fecha').textContent = new Date().toLocaleDateString('es
 
 // ── SYNC ──
 function setSync(st,msg){ document.getElementById('sync-dot').className='sync-dot '+st; document.getElementById('sync-txt').textContent=msg }
-async function push(){ if(!CFG.apiKey||!CFG.binId)return; try{ setSync('loading','Guardando...'); const r=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Versioning':'false'},body:JSON.stringify(S)}); if(!r.ok)throw 0; setSync('ok','Sincronizado · '+fmt(Date.now())); }catch(e){ setSync('error','Error al guardar') } }
-async function pull(){ if(!CFG.apiKey||!CFG.binId)return; try{ setSync('loading','Cargando...'); const r=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}/latest`,{headers:{'X-Master-Key':CFG.apiKey}}); if(!r.ok)throw 0; const d=await r.json(); if(d.record){ const rem=d.record; S.tasks=rem.tasks||S.tasks; S.notes=rem.notes||S.notes; S.areas=rem.areas||S.areas; S.reportes=rem.reportes||S.reportes; if(typeof rem.foco!=='undefined')S.foco=rem.foco; sl(); } setSync('ok','Sincronizado · '+fmt(Date.now())); }catch(e){ setSync('error','Sin conexión') } }
+
+async function push(){
+  if(!CFG.apiKey||!CFG.binId)return;
+  try{
+    setSync('loading','Guardando...');
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Versioning':'false'},
+      body:JSON.stringify(S)
+    });
+    if(!r.ok)throw 0;
+    setSync('ok','Sincronizado · '+fmt(Date.now()));
+  }catch(e){ setSync('error','Error al guardar') }
+}
+
+// ── CAMBIO 2: pull() compara timestamps y solo reemplaza si el remoto es más reciente ──
+async function pull(){
+  if(!CFG.apiKey||!CFG.binId)return;
+  try{
+    setSync('loading','Cargando...');
+    const r=await fetch(`https://api.jsonbin.io/v3/b/${CFG.binId}/latest`,{headers:{'X-Master-Key':CFG.apiKey}});
+    if(!r.ok)throw 0;
+    const d=await r.json();
+    if(d.record){
+      const rem=d.record;
+      const remTs=rem.lastModified||0;
+      const locTs=S.lastModified||0;
+      if(remTs>=locTs){
+        // El remoto es igual o más nuevo → lo usamos
+        S.tasks=rem.tasks||S.tasks;
+        S.notes=rem.notes||S.notes;
+        S.areas=rem.areas||S.areas;
+        S.reportes=rem.reportes||S.reportes;
+        if(typeof rem.foco!=='undefined')S.foco=rem.foco;
+        S.lastModified=remTs;
+        localStorage.setItem(LKEY,JSON.stringify(S));
+        setSync('ok','Sincronizado · '+fmt(Date.now()));
+      } else {
+        // El local es más nuevo → no pisamos, subimos el local
+        setSync('ok','Local más reciente — subiendo...');
+        await push();
+      }
+    } else {
+      setSync('ok','Sincronizado · '+fmt(Date.now()));
+    }
+  }catch(e){ setSync('error','Sin conexión') }
+}
+
 async function createBin(){ try{ const r=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Name':'MiDiaLaboral'},body:JSON.stringify(S)}); if(!r.ok)throw 0; return(await r.json()).metadata.id; }catch(e){return null} }
 async function saveApiKey(){ const k=document.getElementById('api-key-input').value.trim(); if(!k)return alert('Pegá tu Master Key'); CFG.apiKey=k; const bid=await createBin(); if(!bid)return alert('No se pudo conectar. Verificá que la clave sea correcta.'); CFG.binId=bid; localStorage.setItem(CFGKEY,JSON.stringify(CFG)); initApp() }
 function skipSetup(){ CFG.skipped=true; localStorage.setItem(CFGKEY,JSON.stringify(CFG)); initApp() }
@@ -431,7 +461,7 @@ function switchTab(id){ S.tab=id; save(); render() }
 function renderCalendario(){
   const y=S.calYear, m=S.calMonth;
   const lastDay=new Date(y,m+1,0).getDate();
-  const startDow=(new Date(y,m,1).getDay()+6)%7; // Lun=0
+  const startDow=(new Date(y,m,1).getDay()+6)%7;
   const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const DOWS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const td=today();
