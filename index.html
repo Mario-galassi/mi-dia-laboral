@@ -477,13 +477,15 @@ async function save(){ sl(); if(CFG.apiKey&&CFG.binId) await push() }
 // ── RECURRING ──
 function checkRecurring(){
   const td=today(), dow=new Date().getDay();
+  let changed=false;
   S.tasks.filter(t=>t.recur&&!t.done).forEach(t=>{
     if(S.tasks.some(x=>x.recurParent===t.id&&x.fecha===td))return;
     if(t.recur==='diaria'||(t.recur==='semanal'&&(!t.recurDow||t.recurDow===dow))||(t.recur==='mensual'&&(!t.recurDay||t.recurDay===new Date().getDate()))){
       S.tasks.push({...t,id:uid(),done:false,ts:Date.now(),fecha:td,recur:'',recurParent:t.id,subtasks:[],comment:'',link:'',expanded:false});
+      changed=true;
     }
   });
-  sl();
+  if(changed) save(); // solo guarda si realmente hubo cambios
 }
 
 // ── NOTIFICATIONS ──
@@ -953,9 +955,12 @@ function exportExcel(){
 function initApp(){
   document.getElementById('setup-panel').style.display='none';
   document.getElementById('main-content').style.display='block';
-  if(CFG.apiKey&&CFG.binId){ document.getElementById('sync-bar').style.display='flex'; pull().then(()=>render()); }
-  else render();
-  checkRecurring();
+  if(CFG.apiKey&&CFG.binId){
+    document.getElementById('sync-bar').style.display='flex';
+    pull().then(()=>{ checkRecurring(); render(); });
+  } else {
+    checkRecurring(); render();
+  }
   setInterval(checkNotifs, 5*60*1000); checkNotifs();
   if(S.foco) document.getElementById('btn-foco').classList.add('active');
   if(S.notifEnabled) document.getElementById('btn-notif').classList.add('active');
