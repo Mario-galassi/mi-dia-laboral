@@ -334,7 +334,16 @@ input[type=date]{color-scheme:dark}
 
 <script>
 const LKEY='dia_laboral_v7', CFGKEY='dia_laboral_cfg';
+const DEFAULT_CFG = {
+  apiKey: '$2a$10$aIpAgmCY9JFICMO4pBzD3.8Zy.K9HE9eoULAsZIBUCpKHujcwNvtu',
+  binId:  '69ea759faaba8821972eac75'
+};
 let CFG = JSON.parse(localStorage.getItem(CFGKEY)||'{}');
+// Si no tiene apiKey o binId válidos, usar los valores por defecto
+if(!CFG.apiKey || !CFG.binId) {
+  CFG = {...DEFAULT_CFG};
+  localStorage.setItem(CFGKEY, JSON.stringify(CFG));
+}
 let S = JSON.parse(localStorage.getItem(LKEY)||'null') || {
   areas:['Operaciones','Comercial','RRHH','Finanzas'],
   reportes:['Ana','Carlos','Martín','Sofía'],
