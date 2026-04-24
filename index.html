@@ -274,9 +274,11 @@ input[type=date]{color-scheme:dark}
       </div>
       <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
         <p style="margin-bottom:8px">¿Ya tenés un Bin existente? Conectá este dispositivo a uno existente:</p>
-        <input type="text" id="existing-binid-input" placeholder="BinId (ej: 64abc123...)" style="margin-bottom:8px">
+        <textarea id="existing-binid-input" placeholder="BinId (ej: 64abc123...)" style="min-height:52px;margin-bottom:8px;font-size:13px;word-break:break-all"></textarea>
+        <div id="binid-preview" style="font-size:11px;color:var(--text2);margin-bottom:8px;word-break:break-all;display:none"></div>
         <div class="btn-row" style="margin-top:0">
-          <button class="btn" onclick="connectExisting()">Conectar a Bin existente</button>
+          <button class="btn" onclick="previewBinId()">Verificar BinId</button>
+          <button class="btn primary" onclick="connectExisting()">Conectar a Bin existente</button>
         </div>
       </div>
     </div>
@@ -412,7 +414,13 @@ async function pull(){
 }
 
 async function createBin(){ try{ const r=await fetch('https://api.jsonbin.io/v3/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':CFG.apiKey,'X-Bin-Name':'MiDiaLaboral'},body:JSON.stringify(S)}); if(!r.ok)throw 0; return(await r.json()).metadata.id; }catch(e){return null} }
-async function connectExisting(){
+async function previewBinId(){
+  const bid=document.getElementById('existing-binid-input').value.trim();
+  const el=document.getElementById('binid-preview');
+  el.style.display='block';
+  el.innerHTML='BinId ingresado: <strong style="color:var(--accent2)">'+bid+'</strong><br>Longitud: '+bid.length+' caracteres (debería ser 24)';
+}
+function connectExisting(){
   const k=document.getElementById('api-key-input').value.trim();
   const bid=document.getElementById('existing-binid-input').value.trim();
   if(!k)return alert('Pegá tu Master Key primero');
